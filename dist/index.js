@@ -29819,7 +29819,7 @@ async function commentToIssue(context, template, additionalVariables) {
     // in the build
     //
     // eslint-disable-next-line prefer-template,no-path-concat
-    const footerTpl = (0, fs_1.readFileSync)(__dirname + '/templates/footer.md', 'utf8');
+    const footerTpl = (0, fs_1.readFileSync)(__nccwpck_require__.ab + "footer.md", 'utf8');
     const footer = mustache_1.default.render(footerTpl, {
         ...toMustacheView(context),
         ...additionalVariables
