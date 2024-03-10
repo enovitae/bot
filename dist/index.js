@@ -29763,7 +29763,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.removeLabel = exports.addLabels = exports.setLabels = exports.commentToIssue = exports.reactToComment = exports.isMaintainer = exports.getCommandsFromComment = void 0;
+exports.getPullDiff = exports.removeLabel = exports.addLabels = exports.setLabels = exports.commentToIssue = exports.reactToComment = exports.isMaintainer = exports.getCommandsFromComment = void 0;
 const fs_1 = __nccwpck_require__(7147);
 const mustache_1 = __importDefault(__nccwpck_require__(8272));
 const config_1 = __nccwpck_require__(6373);
@@ -29873,6 +29873,25 @@ async function removeLabel(context, name) {
     }
 }
 exports.removeLabel = removeLabel;
+async function getPullDiff(context) {
+    const { owner, repo } = context.repo;
+    // if(context === '')
+    console.log(context);
+    try {
+        return octokit_1.default.pulls.get({
+            owner,
+            repo,
+            pull_number: context.issue.number,
+            mediaType: {
+                format: 'diff'
+            }
+        });
+    }
+    catch (e) {
+        return;
+    }
+}
+exports.getPullDiff = getPullDiff;
 
 
 /***/ }),
@@ -29917,13 +29936,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const fs_1 = __nccwpck_require__(7147);
 const bot_1 = __nccwpck_require__(8104);
 async function run(context) {
-    // We need ncc to detect the concatenation and include the template file
-    // in the build
-    //
-    // eslint-disable-next-line prefer-template,no-path-concat
     const template = (0, fs_1.readFileSync)(__nccwpck_require__.ab + "preview.md", 'utf8');
     (0, bot_1.reactToComment)(context);
-    (0, bot_1.addLabels)(context, ['publish']);
+    (0, bot_1.addLabels)(context, ['new-content']);
     await (0, bot_1.commentToIssue)(context, template);
 }
 exports["default"] = run;

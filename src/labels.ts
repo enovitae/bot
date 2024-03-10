@@ -1,1 +1,1 @@
-export type LabelName = 'publish'
+export type LabelName = 'new-content' | 'published'

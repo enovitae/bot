@@ -152,3 +152,24 @@ export async function removeLabel(
     throw e
   }
 }
+
+export async function getPullDiff(
+  context: Context
+): Promise<OctokitResponse<{ url: string }, number> | undefined> {
+  const { owner, repo } = context.repo
+  // if(context === '')
+  console.log(context)
+
+  try {
+    return octokit.pulls.get({
+      owner,
+      repo,
+      pull_number: context.issue.number,
+      mediaType: {
+        format: 'diff'
+      }
+    })
+  } catch (e) {
+    return
+  }
+}
