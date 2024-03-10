@@ -29907,11 +29907,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.runCommand = exports.commandList = void 0;
 const preview_1 = __importDefault(__nccwpck_require__(3727));
+const publish_1 = __importDefault(__nccwpck_require__(8749));
 exports.commandList = [
     { name: 'preview', fn: preview_1.default },
     { name: 'preview whatsapp', fn: preview_1.default },
     { name: 'preview telegram', fn: preview_1.default },
-    { name: 'preview pinterest', fn: preview_1.default }
+    { name: 'preview pinterest', fn: preview_1.default },
+    { name: 'publish test', fn: publish_1.default }
 ];
 async function runCommand(context, command) {
     console.log(`Running '${command.command}' command for comment ${context.payload.comment?.html_url} ...`);
@@ -29939,6 +29941,26 @@ async function run(context) {
     const template = (0, fs_1.readFileSync)(__nccwpck_require__.ab + "preview.md", 'utf8');
     (0, bot_1.reactToComment)(context);
     (0, bot_1.addLabels)(context, ['new-content']);
+    await (0, bot_1.commentToIssue)(context, template);
+}
+exports["default"] = run;
+
+
+/***/ }),
+
+/***/ 8749:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const fs_1 = __nccwpck_require__(7147);
+const bot_1 = __nccwpck_require__(8104);
+async function run(context) {
+    const template = (0, fs_1.readFileSync)(__nccwpck_require__.ab + "publish.md", 'utf8');
+    (0, bot_1.reactToComment)(context);
+    (0, bot_1.addLabels)(context, ['published']);
+    (0, bot_1.getPullDiff)(context);
     await (0, bot_1.commentToIssue)(context, template);
 }
 exports["default"] = run;

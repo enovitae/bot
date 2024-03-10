@@ -1,5 +1,6 @@
 import { Context } from '@actions/github/lib/context'
 import preview from './preview'
+import publish from './publish'
 
 import { Command } from '../bot'
 
@@ -12,7 +13,9 @@ export const commandList: CommandMap[] = [
   { name: 'preview', fn: preview },
   { name: 'preview whatsapp', fn: preview },
   { name: 'preview telegram', fn: preview },
-  { name: 'preview pinterest', fn: preview }
+  { name: 'preview pinterest', fn: preview },
+
+  { name: 'publish test', fn: publish }
 ]
 
 export async function runCommand(
