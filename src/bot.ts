@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs'
 
 import { Context } from '@actions/github/lib/context'
-import { RequestError } from '@octokit/types'
+import { OctokitResponse, RequestError } from '@octokit/types'
 
 import Mustache from 'mustache'
 
@@ -132,7 +132,7 @@ export async function addLabels(
 export async function removeLabel(
   context: Context,
   name: LabelName
-): Promise<undefined> {
+): Promise<OctokitResponse<{ url: string }[], number> | []> {
   const { owner, repo } = context.repo
 
   try {
