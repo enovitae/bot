@@ -161,7 +161,7 @@ export async function getPullDiff(
   console.log(context)
 
   try {
-    return octokit.pulls.get({
+    const o = octokit.pulls.get({
       owner,
       repo,
       pull_number: context.issue.number,
@@ -169,6 +169,9 @@ export async function getPullDiff(
         format: 'diff'
       }
     })
+    const oo = await o
+    console.log(oo)
+    return o
   } catch (e) {
     return
   }

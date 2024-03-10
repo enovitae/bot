@@ -29878,7 +29878,7 @@ async function getPullDiff(context) {
     // if(context === '')
     console.log(context);
     try {
-        return octokit_1.default.pulls.get({
+        const o = octokit_1.default.pulls.get({
             owner,
             repo,
             pull_number: context.issue.number,
@@ -29886,6 +29886,9 @@ async function getPullDiff(context) {
                 format: 'diff'
             }
         });
+        const oo = await o;
+        console.log(oo);
+        return o;
     }
     catch (e) {
         return;
