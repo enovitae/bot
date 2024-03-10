@@ -3,7 +3,7 @@ import { Context } from '@actions/github/lib/context'
 
 import { reactToComment, commentToIssue, addLabels } from '../bot'
 
-export default async function run(context: Context) {
+export default async function run(context: Context): Promise<void> {
   // We need ncc to detect the concatenation and include the template file
   // in the build
   //

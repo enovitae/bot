@@ -15,7 +15,10 @@ export const commandList: CommandMap[] = [
   { name: 'preview pinterest', fn: preview }
 ]
 
-export async function runCommand(context: Context, command: Command) {
+export async function runCommand(
+  context: Context,
+  command: Command
+): Promise<undefined> {
   console.log(
     `Running '${command.command}' command for comment ${context.payload.comment?.html_url} ...`
   )

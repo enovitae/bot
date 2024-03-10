@@ -3,7 +3,7 @@ import { BOT_USERNAME } from './config'
 import { getCommandsFromComment, isMaintainer } from './bot'
 import { runCommand } from './commands'
 
-export async function run() {
+export async function run(): Promise<undefined> {
   // TODO: Check for github.context.eventName == 'issue_comment'
 
   const { comment } = context.payload

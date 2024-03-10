@@ -28,12 +28,15 @@ export function getCommandsFromComment(body: string): Command[] {
     .filter(e => e.startsWith(`@${BOT_USERNAME} `))
     .map(e => e.replace(new RegExp(`^@${BOT_USERNAME} `), ''))
     .map(e => ({
-      command: e.split(/\s+/).slice(0, 1)[0]!,
+      command: e.split(/\s+/).slice(0, 1)[0],
       args: e.split(/\s+/).slice(1)
     }))
 }
 
-export async function isMaintainer(org: string, username: string) {
+export async function isMaintainer(
+  org: string,
+  username: string
+): Promise<boolean> {
   const members = await octokit.teams.listMembersInOrg({
     org,
     team_slug: 'maintainers'
@@ -42,7 +45,7 @@ export async function isMaintainer(org: string, username: string) {
   return members.data.map(m => m.login).includes(username)
 }
 
-export async function reactToComment(context: Context) {
+export async function reactToComment(context: Context): Promise<undefined> {
   const { owner: org, repo } = context.repo
 
   if (!context.payload.comment) {
@@ -70,7 +73,7 @@ export async function commentToIssue(
   context: Context,
   template: string,
   additionalVariables?: { [key: string]: string }
-) {
+): Promise<void> {
   const { owner, repo } = context.repo
 
   const content = Mustache.render(template, {
@@ -98,7 +101,10 @@ export async function commentToIssue(
   })
 }
 
-export async function setLabels(context: Context, labels: LabelName[]) {
+export async function setLabels(
+  context: Context,
+  labels: LabelName[]
+): Promise<undefined> {
   const { owner, repo } = context.repo
 
   octokit.issues.setLabels({
@@ -109,7 +115,10 @@ export async function setLabels(context: Context, labels: LabelName[]) {
   })
 }
 
-export async function addLabels(context: Context, labels: LabelName[]) {
+export async function addLabels(
+  context: Context,
+  labels: LabelName[]
+): Promise<void> {
   const { owner, repo } = context.repo
 
   octokit.issues.addLabels({
@@ -120,7 +129,10 @@ export async function addLabels(context: Context, labels: LabelName[]) {
   })
 }
 
-export async function removeLabel(context: Context, name: LabelName) {
+export async function removeLabel(
+  context: Context,
+  name: LabelName
+): Promise<undefined> {
   const { owner, repo } = context.repo
 
   try {
