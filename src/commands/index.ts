@@ -15,6 +15,7 @@ export const commandList: CommandMap[] = [
   { name: 'preview telegram', fn: preview },
   { name: 'preview pinterest', fn: preview },
 
+  { name: 'publish', fn: publish },
   { name: 'publish test', fn: publish }
 ]
 

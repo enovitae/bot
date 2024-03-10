@@ -29913,6 +29913,7 @@ exports.commandList = [
     { name: 'preview whatsapp', fn: preview_1.default },
     { name: 'preview telegram', fn: preview_1.default },
     { name: 'preview pinterest', fn: preview_1.default },
+    { name: 'publish', fn: publish_1.default },
     { name: 'publish test', fn: publish_1.default }
 ];
 async function runCommand(context, command) {
