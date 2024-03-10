@@ -1,23 +1,20 @@
-name: 'The name of your action here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'enovitae-bot'
+description: 'The bot automating the enovitae organization publications'
+author: 'enovitae'
 
-# Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
-  icon: 'heart'
+  icon: 'activity'
   color: 'red'
 
-# Define your inputs here.
 inputs:
-  milliseconds:
-    description: 'Your input description here'
-    required: true
-    default: '1000'
-
-# Define your outputs here.
-outputs:
-  time:
-    description: 'Your output description here'
+  github_token:
+    description: 'GITHUB_TOKEN'
+    required: false
+    default: '${{ github.token }}'
+  username:
+    description: The username of the bot
+    required: false
+    default: bot
 
 runs:
   using: node20
