@@ -43,7 +43,7 @@ export const diffJSON = {
     '@@ -0,0 +1 @@\n' +
     '+dev branch\n'
 }
-
+export const dittTextMock = 'dev branch'
 export const diffJSONResponse = {
   data: diffJSON,
   headers: { 'content-length': '1736', 'content-type': 'application/json' },
