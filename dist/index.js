@@ -29876,9 +29876,9 @@ exports.removeLabel = removeLabel;
 async function getPullDiff(context) {
     const { owner, repo } = context.repo;
     // if(context === '')
-    console.log(context);
+    // console.log(context)
     try {
-        const o = octokit_1.default.pulls.get({
+        const { data } = await octokit_1.default.pulls.get({
             owner,
             repo,
             pull_number: context.issue.number,
@@ -29886,12 +29886,11 @@ async function getPullDiff(context) {
                 format: 'diff'
             }
         });
-        const oo = await o;
-        console.log(oo);
-        return o;
+        return data;
     }
     catch (e) {
-        return;
+        console.error(e);
+        return e;
     }
 }
 exports.getPullDiff = getPullDiff;
@@ -29958,13 +29957,22 @@ exports["default"] = run;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.analyzeDiff = void 0;
 const fs_1 = __nccwpck_require__(7147);
 const bot_1 = __nccwpck_require__(8104);
+const analyzeDiff = (diff) => {
+    console.log(diff);
+    return '';
+};
+exports.analyzeDiff = analyzeDiff;
 async function run(context) {
     const template = (0, fs_1.readFileSync)(__nccwpck_require__.ab + "publish.md", 'utf8');
     (0, bot_1.reactToComment)(context);
     (0, bot_1.addLabels)(context, ['published']);
-    (0, bot_1.getPullDiff)(context);
+    const diff = await (0, bot_1.getPullDiff)(context);
+    (0, exports.analyzeDiff)(diff);
+    const diffRaw = await (0, bot_1.getPullDiff)(context);
+    console.log('raw', diffRaw, diffRaw.data);
     await (0, bot_1.commentToIssue)(context, template);
 }
 exports["default"] = run;
@@ -29996,7 +30004,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(2186);
 const github_1 = __nccwpck_require__(5438);
 const githubToken = process.env.GITHUB_TOKEN || (0, core_1.getInput)('github_token') || 'token';
-exports["default"] = (0, github_1.getOctokit)(githubToken).rest;
+exports["default"] = (0, github_1.getOctokit)(githubToken, { request: fetch }).rest;
 
 
 /***/ }),

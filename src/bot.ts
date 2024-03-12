@@ -1,13 +1,21 @@
 import { readFileSync } from 'fs'
 
 import { Context } from '@actions/github/lib/context'
-import { OctokitResponse, RequestError } from '@octokit/types'
+import {
+  GetResponseDataTypeFromEndpointMethod,
+  OctokitResponse,
+  RequestError
+} from '@octokit/types'
 
 import Mustache from 'mustache'
 
 import { BOT_USERNAME, MAINTAINERS_TEAM, CHANNELS } from './config'
 import octokit from './octokit'
 import { LabelName } from './labels'
+
+export type Pull = GetResponseDataTypeFromEndpointMethod<
+  typeof octokit.pulls.get
+>
 
 interface TemplateVariables {
   maintainers_team: string
@@ -153,15 +161,13 @@ export async function removeLabel(
   }
 }
 
-export async function getPullDiff(
-  context: Context
-): Promise<OctokitResponse<{ url: string }, number> | undefined> {
+export async function getPullDiff(context: Context): Promise<Pull | unknown> {
   const { owner, repo } = context.repo
   // if(context === '')
-  console.log(context)
+  // console.log(context)
 
   try {
-    const o = octokit.pulls.get({
+    const { data } = await octokit.pulls.get({
       owner,
       repo,
       pull_number: context.issue.number,
@@ -169,10 +175,9 @@ export async function getPullDiff(
         format: 'diff'
       }
     })
-    const oo = await o
-    console.log(oo)
-    return o
+    return data
   } catch (e) {
-    return
+    console.error(e)
+    return e
   }
 }
