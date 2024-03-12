@@ -30205,6 +30205,9 @@ const bot_1 = __nccwpck_require__(8104);
 const gitdiff_parser_1 = __importDefault(__nccwpck_require__(153));
 const analyzeDiff = (diff) => {
     console.log(diff); // diff
+    if (!diff) {
+        return '';
+    }
     const [diffText] = gitdiff_parser_1.default
         .parse(diff)
         .map(f => f.hunks.map(h => h.changes.map(c => c.content)))
@@ -30217,8 +30220,10 @@ async function run(context) {
     (0, bot_1.reactToComment)(context);
     (0, bot_1.addLabels)(context, ['preview']);
     const diff = await (0, bot_1.getPullDiff)(context);
-    const whatChanged = (0, exports.analyzeDiff)(diff.data);
+    console.log(diff);
+    const whatChanged = (0, exports.analyzeDiff)(diff);
     await (0, bot_1.commentToIssue)(context, template, { diff: whatChanged });
+    return template;
 }
 exports["default"] = run;
 
@@ -30236,8 +30241,9 @@ const bot_1 = __nccwpck_require__(8104);
 async function run(context) {
     const template = (0, fs_1.readFileSync)(__nccwpck_require__.ab + "publish.md", 'utf8');
     (0, bot_1.reactToComment)(context);
-    (0, bot_1.addLabels)(context, ['new-content']);
+    (0, bot_1.addLabels)(context, ['published']);
     await (0, bot_1.commentToIssue)(context, template);
+    return template;
 }
 exports["default"] = run;
 

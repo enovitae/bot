@@ -1,6 +1,8 @@
 One or more new publications have been detected 🎉
 
+```
 {{ diff }}
+```
 
 Maintainers should evaluate and eventually, accept and publish all over
 preconfigured channels.

@@ -2,11 +2,13 @@ import { readFileSync } from 'fs'
 import { Context } from '@actions/github/lib/context'
 
 import { reactToComment, commentToIssue, addLabels, getPullDiff } from '../bot'
-import { OctokitResponse } from '@octokit/types'
 import gitdiffParser from 'gitdiff-parser'
 
 export const analyzeDiff = (diff: string): string => {
   console.log(diff) // diff
+  if (!diff) {
+    return ''
+  }
   const [diffText] = gitdiffParser
     .parse(diff)
     .map(f => f.hunks.map(h => h.changes.map(c => c.content)))
@@ -14,15 +16,16 @@ export const analyzeDiff = (diff: string): string => {
   return diffText
 }
 
-export default async function run(context: Context): Promise<void> {
+export default async function run(context: Context): Promise<string> {
   const template = readFileSync(`${__dirname}/../templates/preview.md`, 'utf8')
 
   reactToComment(context)
   addLabels(context, ['preview'])
-  const diff = await (getPullDiff(context) as Promise<
-    OctokitResponse<string, number>
-  >)
-  const whatChanged = analyzeDiff(diff.data)
+  const diff = await (getPullDiff(context) as Promise<string>)
+  console.log(diff)
+
+  const whatChanged = analyzeDiff(diff)
 
   await commentToIssue(context, template, { diff: whatChanged })
+  return template
 }

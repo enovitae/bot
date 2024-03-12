@@ -1,9 +1,9 @@
 import { Context } from '@actions/github/lib/context'
 import { server } from '../__mocks__/node'
 import { Pull, getPullDiff } from '../bot'
+import { analyzeDiff } from '../commands/preview'
 import { diffJSON, diffJSONResponse, dittTextMock } from '../__mocks__/handlers'
 import { OctokitResponse } from '@octokit/types'
-import gitDiffParser from 'gitdiff-parser'
 
 // jest.mock('../__mocks__/node')
 // jest.mock('../__mocks__/handlers')
@@ -137,16 +137,15 @@ it('receives a mocked response to a REST API request using custom type', async (
   }
   expect(diff.data).toEqual(diffJSON.data)
 
-  const [diffText] = gitDiffParser
-    .parse(diff.data)
-    .map(f => f.hunks.map(h => h.changes.map(c => c.content)))
-    .flat(2)
+  const diffText = analyzeDiff(diff.data)
   expect(diffText).toEqual(dittTextMock)
+
+  const diffText2 = analyzeDiff('')
+  expect(diffText2).toEqual('')
 })
 it('receives a mocked response to a REST API request accessing to data', async () => {
   const diff = await (getPullDiff(context) as Promise<Pull>)
-  if (diff) {
-    console.log(diff)
-  }
   expect(diff).toEqual(diffJSON)
+  const diff2 = await (getPullDiff(context) as Promise<OctokitResponse<string>>)
+  expect(diff2.data).toEqual(diffJSON.data)
 })

@@ -6,7 +6,7 @@ import { Command } from '../bot'
 
 interface CommandMap {
   name: string
-  fn: (context: Context, args?: string[]) => Promise<void>
+  fn: (context: Context, args?: string[]) => Promise<string>
 }
 
 export const commandList: CommandMap[] = [

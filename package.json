@@ -1,6 +1,6 @@
 {
-  "name": "typescript-action",
-  "description": "GitHub Actions TypeScript template",
+  "name": "enovitae-bot",
+  "description": "The bot automating the enovitae organization publications",
   "version": "0.0.0",
   "author": "",
   "private": true,
