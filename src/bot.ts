@@ -21,7 +21,7 @@ interface TemplateVariables {
   maintainers_team: string
   bot_username: string
   comment_author_username: string
-  channels: string[]
+  channels: typeof CHANNELS
 }
 
 export interface Command {
@@ -163,8 +163,6 @@ export async function removeLabel(
 
 export async function getPullDiff(context: Context): Promise<Pull | unknown> {
   const { owner, repo } = context.repo
-  // if(context === '')
-  // console.log(context)
 
   try {
     const { data } = await octokit.pulls.get({

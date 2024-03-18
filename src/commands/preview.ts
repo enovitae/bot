@@ -22,6 +22,7 @@ export default async function run(context: Context): Promise<string> {
   reactToComment(context)
   addLabels(context, ['preview'])
   const diff = await (getPullDiff(context) as Promise<string>)
+  // TODO remove
   console.log(diff)
 
   const whatChanged = analyzeDiff(diff)

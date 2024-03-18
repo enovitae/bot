@@ -1,14 +1,45 @@
 import { readFileSync } from 'fs'
 import { Context } from '@actions/github/lib/context'
 
-import { reactToComment, commentToIssue, addLabels } from '../bot'
+import { reactToComment, commentToIssue, addLabels, getPullDiff } from '../bot'
+import { sendZap } from '../channels'
+import { CHANNELS } from '../config'
+import { analyzeDiff } from './preview'
 
-export default async function run(context: Context): Promise<string> {
+export const runPublish = async (
+  args: string[],
+  whatChanged: string,
+  context: Context,
+  template: string
+): Promise<boolean> => {
+  if (args && args?.length > 0 && CHANNELS.some(c => c === args[0])) {
+    await sendZap({ channel: args[0], message: whatChanged })
+    await commentToIssue(context, template)
+    await addLabels(context, ['published'])
+    return true
+  } else {
+    console.log('something wrong publishing', args)
+    return false
+  }
+}
+
+export default async function run(
+  context: Context,
+  args?: string[]
+): Promise<string> {
   const template = readFileSync(`${__dirname}/../templates/publish.md`, 'utf8')
 
   reactToComment(context)
-  addLabels(context, ['published'])
+  const diff = await (getPullDiff(context) as Promise<string>)
+  // TODO remove
+  console.log(diff)
+  const whatChanged = analyzeDiff(diff)
 
-  await commentToIssue(context, template)
+  // I expect channel as first parameter
+  if (args) {
+    runPublish(args, whatChanged, context, template)
+  } else {
+    console.log('args not valid', args)
+  }
   return template
 }

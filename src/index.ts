@@ -35,6 +35,15 @@ export async function run(): Promise<undefined> {
     return
   }
 
+  // this bot runs only in PR environment
+  if (!context.payload?.issue?.node_id.startsWith('PR')) {
+    console.log(
+      'skipping issues, context should be a PR',
+      context.payload?.issue
+    )
+    return
+  }
+
   await Promise.all(commands.map(async cmd => runCommand(context, cmd)))
 }
 
