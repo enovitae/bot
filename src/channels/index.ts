@@ -1,9 +1,38 @@
 import { zapier } from './zapier'
+import type { AxiosResponse } from 'axios'
 
 export type Message = {
   message: string
   channel: string
   // channel: (typeof CHANNELS)[number]
 }
+export interface ApiResponse {
+  data: {
+    attempt: string
+    id: string
+    request_id: string
+    status: string
+  }
+  status: number
+}
 
-export { zapier }
+export interface ApiError {
+  message: string
+  status: number
+}
+
+const send = async ({
+  channel,
+  message
+}: Message): Promise<AxiosResponse<ApiResponse> | ApiError> => {
+  switch (channel) {
+    case 'zapier':
+      return zapier({ channel, message })
+    case 'pinterest':
+    case 'telegram':
+    case 'whatsapp':
+      return Promise.resolve({ message: 'not yet implemented', status: 999 })
+  }
+  return Promise.resolve({ message: 'unknown channels specified', status: 999 })
+}
+export { send }

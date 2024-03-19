@@ -73,13 +73,10 @@ it('test publish commands', async () => {
   expect(await runPublish(null, diffJSON.data, context, '')).toBeFalsy()
   // @ts-ignore
   expect(await runPublish('null', diffJSON.data, context, '')).toBeFalsy()
-  expect(
-    await runPublish(['whatsapp'], diffJSON.data, context, '')
-  ).toBeTruthy()
+  expect(await runPublish(['whatsapp'], diffJSON.data, context, '')).toBeFalsy()
   expect(
     await runPublish(['pinterest'], diffJSON.data, context, '')
-  ).toBeTruthy()
-  expect(
-    await runPublish(['telegram'], diffJSON.data, context, '')
-  ).toBeTruthy()
+  ).toBeFalsy()
+  expect(await runPublish(['telegram'], diffJSON.data, context, '')).toBeFalsy()
+  expect(await runPublish(['zapier'], diffJSON.data, context, '')).toBeTruthy()
 })

@@ -33659,9 +33659,20 @@ exports.getPullDiff = getPullDiff;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.zapier = void 0;
+exports.send = void 0;
 const zapier_1 = __nccwpck_require__(2532);
-Object.defineProperty(exports, "zapier", ({ enumerable: true, get: function () { return zapier_1.zapier; } }));
+const send = async ({ channel, message }) => {
+    switch (channel) {
+        case 'zapier':
+            return (0, zapier_1.zapier)({ channel, message });
+        case 'pinterest':
+        case 'telegram':
+        case 'whatsapp':
+            return Promise.resolve({ message: 'not yet implemented', status: 999 });
+    }
+    return Promise.resolve({ message: 'unknown channels specified', status: 999 });
+};
+exports.send = send;
 
 
 /***/ }),
@@ -33671,24 +33682,61 @@ Object.defineProperty(exports, "zapier", ({ enumerable: true, get: function () {
 
 "use strict";
 
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.zapier = void 0;
-const axios_1 = __importDefault(__nccwpck_require__(8757));
+const axios_1 = __importStar(__nccwpck_require__(8757));
 const config_1 = __nccwpck_require__(6373);
 async function zapier({ channel, message }) {
-    const { data } = await axios_1.default.post(config_1.ZAPIER_API_URL, { message, channel }, {
-        headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json'
+    try {
+        const data = await axios_1.default.post(config_1.ZAPIER_API_URL, { message, channel }, {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        // ex
+        // {"attempt":"018e4eaa-4364-3c25-a3f5-49d29a5b5595","id":"018e4eaa-4364-3c25-a3f5-49d29a5b5595",
+        // "request_id":"018e4eaa-4364-3c25-a3f5-49d29a5b5595","status":"success"}
+        return data;
+    }
+    catch (error) {
+        if ((0, axios_1.isAxiosError)(error)) {
+            return {
+                message: error.message,
+                status: error?.response?.status || 999
+            };
         }
-    });
-    // ex
-    // {"attempt":"018e4eaa-4364-3c25-a3f5-49d29a5b5595","id":"018e4eaa-4364-3c25-a3f5-49d29a5b5595",
-    // "request_id":"018e4eaa-4364-3c25-a3f5-49d29a5b5595","status":"success"}
-    return data.status;
+        else {
+            console.log('unexpected error: ', error);
+            return {
+                message: 'An unexpected error occurred',
+                status: 999
+            };
+        }
+    }
 }
 exports.zapier = zapier;
 
@@ -33709,14 +33757,23 @@ const preview_1 = __importDefault(__nccwpck_require__(3727));
 const publish_1 = __importDefault(__nccwpck_require__(8749));
 exports.commandList = [
     { name: 'preview', fn: preview_1.default },
+    { name: 'preview zapier', fn: preview_1.default },
     { name: 'preview whatsapp', fn: preview_1.default },
     { name: 'preview telegram', fn: preview_1.default },
     { name: 'preview pinterest', fn: preview_1.default },
     { name: 'publish', fn: publish_1.default },
-    { name: 'publish test', fn: publish_1.default }
+    { name: 'publish test zapier', fn: publish_1.default },
+    { name: 'publish test whatsapp', fn: publish_1.default },
+    { name: 'publish test telegram', fn: publish_1.default },
+    { name: 'publish test pinterest', fn: publish_1.default },
+    { name: 'publish zapier', fn: publish_1.default },
+    { name: 'publish whatsapp', fn: publish_1.default },
+    { name: 'publish telegram', fn: publish_1.default },
+    { name: 'publish pinterest', fn: publish_1.default },
+    { name: 'publish all', fn: publish_1.default }
 ];
 async function runCommand(context, command) {
-    console.log(`Running '${command.command}' command for comment ${context.payload.comment?.html_url} ...`);
+    console.log(`Running '${command.command}' with args '${command.args}' command for comment ${context.payload.comment?.html_url} ...`);
     const cmd = exports.commandList.find(c => c.name === command.command);
     if (!cmd) {
         console.log(`Unknown command '${command.command}'`);
@@ -33784,7 +33841,16 @@ const config_1 = __nccwpck_require__(6373);
 const preview_1 = __nccwpck_require__(3727);
 const runPublish = async (args, whatChanged, context, template) => {
     if (args && args?.length > 0 && config_1.CHANNELS.some(c => c === args[0])) {
-        await (0, channels_1.zapier)({ channel: args[0], message: whatChanged });
+        const res = await (0, channels_1.send)({ channel: args[0], message: whatChanged });
+        if ('data' in res) {
+            console.log(res.data, res.status);
+        }
+        else {
+            console.error(res.message, res.status);
+            const errorTpl = (0, fs_1.readFileSync)(__nccwpck_require__.ab + "errors.md", 'utf8');
+            await (0, bot_1.commentToIssue)(context, errorTpl, { errors: res.message });
+            return false;
+        }
         await (0, bot_1.commentToIssue)(context, template);
         await (0, bot_1.addLabels)(context, ['published']);
         return true;
