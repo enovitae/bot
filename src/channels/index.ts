@@ -31,8 +31,11 @@ const send = async ({
     case 'pinterest':
     case 'telegram':
     case 'whatsapp':
-      return Promise.resolve({ message: 'not yet implemented', status: 999 })
+      return Promise.resolve({
+        message: 'channel not yet implemented',
+        status: 999
+      })
   }
-  return Promise.resolve({ message: 'unknown channels specified', status: 999 })
+  return Promise.resolve({ message: 'unknown channel specified', status: 999 })
 }
 export { send }

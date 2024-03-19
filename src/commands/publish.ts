@@ -3,7 +3,7 @@ import { Context } from '@actions/github/lib/context'
 
 import { reactToComment, commentToIssue, addLabels, getPullDiff } from '../bot'
 import { send } from '../channels'
-import { CHANNELS } from '../config'
+import { CHANNELS, ENABLED_CHANNELS } from '../config'
 import { analyzeDiff } from './preview'
 
 export const runPublish = async (
@@ -26,7 +26,9 @@ export const runPublish = async (
       return false
     }
 
-    await commentToIssue(context, template)
+    await commentToIssue(context, template, {
+      channels: ENABLED_CHANNELS.join(' ')
+    })
     await addLabels(context, ['published'])
     return true
   } else {

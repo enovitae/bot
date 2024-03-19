@@ -33668,9 +33668,12 @@ const send = async ({ channel, message }) => {
         case 'pinterest':
         case 'telegram':
         case 'whatsapp':
-            return Promise.resolve({ message: 'not yet implemented', status: 999 });
+            return Promise.resolve({
+                message: 'channel not yet implemented',
+                status: 999
+            });
     }
-    return Promise.resolve({ message: 'unknown channels specified', status: 999 });
+    return Promise.resolve({ message: 'unknown channel specified', status: 999 });
 };
 exports.send = send;
 
@@ -33762,10 +33765,6 @@ exports.commandList = [
     { name: 'preview telegram', fn: preview_1.default },
     { name: 'preview pinterest', fn: preview_1.default },
     { name: 'publish', fn: publish_1.default },
-    { name: 'publish test zapier', fn: publish_1.default },
-    { name: 'publish test whatsapp', fn: publish_1.default },
-    { name: 'publish test telegram', fn: publish_1.default },
-    { name: 'publish test pinterest', fn: publish_1.default },
     { name: 'publish zapier', fn: publish_1.default },
     { name: 'publish whatsapp', fn: publish_1.default },
     { name: 'publish telegram', fn: publish_1.default },
@@ -33799,6 +33798,7 @@ exports.analyzeDiff = void 0;
 const fs_1 = __nccwpck_require__(7147);
 const bot_1 = __nccwpck_require__(8104);
 const gitdiff_parser_1 = __importDefault(__nccwpck_require__(153));
+const config_1 = __nccwpck_require__(6373);
 const analyzeDiff = (diff) => {
     console.log(diff); // diff
     if (!diff) {
@@ -33819,7 +33819,10 @@ async function run(context) {
     // TODO remove
     console.log(diff);
     const whatChanged = (0, exports.analyzeDiff)(diff);
-    await (0, bot_1.commentToIssue)(context, template, { diff: whatChanged });
+    await (0, bot_1.commentToIssue)(context, template, {
+        diff: whatChanged,
+        channels: config_1.ENABLED_CHANNELS.join(' ')
+    });
     return template;
 }
 exports["default"] = run;
@@ -33851,7 +33854,9 @@ const runPublish = async (args, whatChanged, context, template) => {
             await (0, bot_1.commentToIssue)(context, errorTpl, { errors: res.message });
             return false;
         }
-        await (0, bot_1.commentToIssue)(context, template);
+        await (0, bot_1.commentToIssue)(context, template, {
+            channels: config_1.ENABLED_CHANNELS.join(' ')
+        });
         await (0, bot_1.addLabels)(context, ['published']);
         return true;
     }
@@ -33888,11 +33893,12 @@ exports["default"] = run;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ZAPIER_API_URL = exports.CHANNELS = exports.MAINTAINERS_TEAM = exports.BOT_USERNAME = void 0;
+exports.ZAPIER_API_URL = exports.ENABLED_CHANNELS = exports.CHANNELS = exports.MAINTAINERS_TEAM = exports.BOT_USERNAME = void 0;
 const core_1 = __nccwpck_require__(2186);
 exports.BOT_USERNAME = process.env.BOT_USERNAME || (0, core_1.getInput)('username');
 exports.MAINTAINERS_TEAM = 'enovitae/maintainers';
 exports.CHANNELS = ['whatsapp', 'telegram', 'pinterest', 'zapier'];
+exports.ENABLED_CHANNELS = ['zapier'];
 exports.ZAPIER_API_URL = process.env.ZAPIER_API_URL || 'https://api.example.org';
 
 

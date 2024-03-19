@@ -15,3 +15,5 @@ to selected channel.
 
 Use `@{{ bot_username }} publish all` will send a production ready message to
 all preconfigured channels.
+
+Note: enabled channels are {{ channels }}

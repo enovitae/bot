@@ -3,6 +3,7 @@ import { Context } from '@actions/github/lib/context'
 
 import { reactToComment, commentToIssue, addLabels, getPullDiff } from '../bot'
 import gitdiffParser from 'gitdiff-parser'
+import { ENABLED_CHANNELS } from '../config'
 
 export const analyzeDiff = (diff: string): string => {
   console.log(diff) // diff
@@ -27,6 +28,9 @@ export default async function run(context: Context): Promise<string> {
 
   const whatChanged = analyzeDiff(diff)
 
-  await commentToIssue(context, template, { diff: whatChanged })
+  await commentToIssue(context, template, {
+    diff: whatChanged,
+    channels: ENABLED_CHANNELS.join(' ')
+  })
   return template
 }

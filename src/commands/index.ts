@@ -17,10 +17,6 @@ export const commandList: CommandMap[] = [
   { name: 'preview pinterest', fn: preview },
 
   { name: 'publish', fn: publish },
-  { name: 'publish test zapier', fn: publish },
-  { name: 'publish test whatsapp', fn: publish },
-  { name: 'publish test telegram', fn: publish },
-  { name: 'publish test pinterest', fn: publish },
   { name: 'publish zapier', fn: publish },
   { name: 'publish whatsapp', fn: publish },
   { name: 'publish telegram', fn: publish },
