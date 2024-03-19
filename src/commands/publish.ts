@@ -2,7 +2,7 @@ import { readFileSync } from 'fs'
 import { Context } from '@actions/github/lib/context'
 
 import { reactToComment, commentToIssue, addLabels, getPullDiff } from '../bot'
-import { sendZap } from '../channels'
+import { zapier } from '../channels'
 import { CHANNELS } from '../config'
 import { analyzeDiff } from './preview'
 
@@ -13,7 +13,7 @@ export const runPublish = async (
   template: string
 ): Promise<boolean> => {
   if (args && args?.length > 0 && CHANNELS.some(c => c === args[0])) {
-    await sendZap({ channel: args[0], message: whatChanged })
+    await zapier({ channel: args[0], message: whatChanged })
     await commentToIssue(context, template)
     await addLabels(context, ['published'])
     return true

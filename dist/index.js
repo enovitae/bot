@@ -33654,6 +33654,19 @@ exports.getPullDiff = getPullDiff;
 /***/ }),
 
 /***/ 6377:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.zapier = void 0;
+const zapier_1 = __nccwpck_require__(2532);
+Object.defineProperty(exports, "zapier", ({ enumerable: true, get: function () { return zapier_1.zapier; } }));
+
+
+/***/ }),
+
+/***/ 2532:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -33662,11 +33675,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sendZap = void 0;
+exports.zapier = void 0;
 const axios_1 = __importDefault(__nccwpck_require__(8757));
 const config_1 = __nccwpck_require__(6373);
-async function sendZap({ channel, message }) {
-    const { data } = await axios_1.default.post(config_1.API_URL, { message, channel }, {
+async function zapier({ channel, message }) {
+    const { data } = await axios_1.default.post(config_1.ZAPIER_API_URL, { message, channel }, {
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json'
@@ -33677,7 +33690,7 @@ async function sendZap({ channel, message }) {
     // "request_id":"018e4eaa-4364-3c25-a3f5-49d29a5b5595","status":"success"}
     return data.status;
 }
-exports.sendZap = sendZap;
+exports.zapier = zapier;
 
 
 /***/ }),
@@ -33771,7 +33784,7 @@ const config_1 = __nccwpck_require__(6373);
 const preview_1 = __nccwpck_require__(3727);
 const runPublish = async (args, whatChanged, context, template) => {
     if (args && args?.length > 0 && config_1.CHANNELS.some(c => c === args[0])) {
-        await (0, channels_1.sendZap)({ channel: args[0], message: whatChanged });
+        await (0, channels_1.zapier)({ channel: args[0], message: whatChanged });
         await (0, bot_1.commentToIssue)(context, template);
         await (0, bot_1.addLabels)(context, ['published']);
         return true;
@@ -33809,12 +33822,12 @@ exports["default"] = run;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.API_URL = exports.CHANNELS = exports.MAINTAINERS_TEAM = exports.BOT_USERNAME = void 0;
+exports.ZAPIER_API_URL = exports.CHANNELS = exports.MAINTAINERS_TEAM = exports.BOT_USERNAME = void 0;
 const core_1 = __nccwpck_require__(2186);
 exports.BOT_USERNAME = process.env.BOT_USERNAME || (0, core_1.getInput)('username');
 exports.MAINTAINERS_TEAM = 'enovitae/maintainers';
-exports.CHANNELS = ['whatsapp', 'telegram', 'pinterest'];
-exports.API_URL = process.env.API_URL || 'https://api.example.org';
+exports.CHANNELS = ['whatsapp', 'telegram', 'pinterest', 'zapier'];
+exports.ZAPIER_API_URL = process.env.ZAPIER_API_URL || 'https://api.example.org';
 
 
 /***/ }),
