@@ -18,6 +18,9 @@ inputs:
   code_path:
     description: Path of project's code
     required: false
+  db_file:
+    description: DB file
+    required: false
 
 runs:
   using: node20
