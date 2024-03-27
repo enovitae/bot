@@ -32,6 +32,7 @@ export const runPublish = async (
     await addLabels(context, ['published'])
     return true
   } else {
+    // FIXME, triggered when @enovitae-bot publish (no args)
     console.log('something wrong publishing', args)
     return false
   }
@@ -50,6 +51,7 @@ export default async function run(
   const whatChanged = analyzeDiff(diff)
 
   // I expect channel as first parameter
+  // TODO ugly
   if (args) {
     runPublish(args, whatChanged, context, template)
   } else {

@@ -4,7 +4,7 @@ import { getCommandsFromComment, isMaintainer } from './bot'
 import { runCommand } from './commands'
 
 export async function run(): Promise<undefined> {
-  // TODO: Check for github.context.eventName == 'issue_comment'
+  // TODO: wrap all of those exceptions and comment?
 
   const { comment } = context.payload
   if (!comment) {
@@ -37,6 +37,7 @@ export async function run(): Promise<undefined> {
 
   // this bot runs only in PR environment
   if (!context.payload?.issue?.node_id.startsWith('PR')) {
+    // TODO comment the issue, saying that
     console.log(
       'skipping issues, context should be a PR',
       context.payload?.issue
