@@ -33919,9 +33919,10 @@ exports["default"] = run;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ZAPIER_API_URL = exports.ENABLED_CHANNELS = exports.CHANNELS = exports.MAINTAINERS_TEAM = exports.BOT_USERNAME = void 0;
+exports.ZAPIER_API_URL = exports.ENABLED_CHANNELS = exports.CHANNELS = exports.MAINTAINERS_TEAM = exports.CODE_PATH = exports.BOT_USERNAME = void 0;
 const core_1 = __nccwpck_require__(2186);
 exports.BOT_USERNAME = process.env.BOT_USERNAME || (0, core_1.getInput)('username');
+exports.CODE_PATH = '/home/runner/work/test-bot/test-bot';
 exports.MAINTAINERS_TEAM = 'enovitae/maintainers';
 exports.CHANNELS = ['whatsapp', 'telegram', 'pinterest', 'zapier'];
 exports.ENABLED_CHANNELS = ['zapier'];
@@ -33952,8 +33953,9 @@ exports["default"] = (0, github_1.getOctokit)(githubToken, { request: fetch }).r
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.checkFSAccess = void 0;
 const fs_1 = __nccwpck_require__(7147);
+const config_1 = __nccwpck_require__(6373);
 const checkFSAccess = () => {
-    const src = (0, fs_1.readFileSync)(`${__dirname}/../code/global.css`, 'utf8');
+    const src = (0, fs_1.readFileSync)(`${config_1.CODE_PATH}/global.css`, 'utf8');
     console.log('trying to read a sample project file', src);
     return !!src;
 };
