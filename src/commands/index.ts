@@ -24,13 +24,13 @@ export const commandList: CommandMap[] = [
   { name: 'publish pinterest', fn: publish },
   { name: 'publish all', fn: publish },
 
-  { name: 'polling', fn: polling },
+  { name: 'polling', fn: polling }
 ]
 
 export async function runCommand(
   context: Context,
   command: Command
-): Promise<undefined> {
+): Promise<undefined | string> {
   console.log(
     `Running '${command.command}' with args '${command.args}' command for comment ${context.payload.comment?.html_url} ...`
   )
@@ -41,5 +41,5 @@ export async function runCommand(
     return
   }
 
-  await cmd.fn(context, command.args)
+  return await cmd.fn(context, command.args)
 }

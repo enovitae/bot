@@ -9,5 +9,5 @@ export default async function run(context: Context): Promise<string> {
   await commentToIssue(context, template, {
     diff: 'check logs'
   })
-  return checkFS ? 'ok': 'ko'
+  return checkFS ? 'ok' : 'ko'
 }

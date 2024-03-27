@@ -33758,6 +33758,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.runCommand = exports.commandList = void 0;
 const preview_1 = __importDefault(__nccwpck_require__(3727));
 const publish_1 = __importDefault(__nccwpck_require__(8749));
+const polling_1 = __importDefault(__nccwpck_require__(1085));
 exports.commandList = [
     { name: 'preview', fn: preview_1.default },
     { name: 'preview zapier', fn: preview_1.default },
@@ -33769,7 +33770,8 @@ exports.commandList = [
     { name: 'publish whatsapp', fn: publish_1.default },
     { name: 'publish telegram', fn: publish_1.default },
     { name: 'publish pinterest', fn: publish_1.default },
-    { name: 'publish all', fn: publish_1.default }
+    { name: 'publish all', fn: publish_1.default },
+    { name: 'polling', fn: polling_1.default }
 ];
 async function runCommand(context, command) {
     console.log(`Running '${command.command}' with args '${command.args}' command for comment ${context.payload.comment?.html_url} ...`);
@@ -33778,9 +33780,31 @@ async function runCommand(context, command) {
         console.log(`Unknown command '${command.command}'`);
         return;
     }
-    await cmd.fn(context, command.args);
+    return await cmd.fn(context, command.args);
 }
 exports.runCommand = runCommand;
+
+
+/***/ }),
+
+/***/ 1085:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const bot_1 = __nccwpck_require__(8104);
+const poller_1 = __nccwpck_require__(1072);
+const fs_1 = __nccwpck_require__(7147);
+async function run(context) {
+    const template = (0, fs_1.readFileSync)(__nccwpck_require__.ab + "polling.md", 'utf8');
+    const checkFS = (0, poller_1.checkFSAccess)();
+    await (0, bot_1.commentToIssue)(context, template, {
+        diff: 'check logs'
+    });
+    return checkFS ? 'ok' : 'ko';
+}
+exports["default"] = run;
 
 
 /***/ }),
@@ -33861,6 +33885,7 @@ const runPublish = async (args, whatChanged, context, template) => {
         return true;
     }
     else {
+        // FIXME, triggered when @enovitae-bot publish (no args)
         console.log('something wrong publishing', args);
         return false;
     }
@@ -33874,6 +33899,7 @@ async function run(context, args) {
     console.log(diff);
     const whatChanged = (0, preview_1.analyzeDiff)(diff);
     // I expect channel as first parameter
+    // TODO ugly
     if (args) {
         (0, exports.runPublish)(args, whatChanged, context, template);
     }
@@ -33914,6 +33940,24 @@ const core_1 = __nccwpck_require__(2186);
 const github_1 = __nccwpck_require__(5438);
 const githubToken = process.env.GITHUB_TOKEN || (0, core_1.getInput)('github_token') || 'token';
 exports["default"] = (0, github_1.getOctokit)(githubToken, { request: fetch }).rest;
+
+
+/***/ }),
+
+/***/ 1072:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.checkFSAccess = void 0;
+const fs_1 = __nccwpck_require__(7147);
+const checkFSAccess = () => {
+    const src = (0, fs_1.readFileSync)(`${__dirname}/../code/global.css`, 'utf8');
+    console.log('trying to read a sample project file', src);
+    return !!src;
+};
+exports.checkFSAccess = checkFSAccess;
 
 
 /***/ }),
@@ -40196,7 +40240,7 @@ const config_1 = __nccwpck_require__(6373);
 const bot_1 = __nccwpck_require__(8104);
 const commands_1 = __nccwpck_require__(4362);
 async function run() {
-    // TODO: Check for github.context.eventName == 'issue_comment'
+    // TODO: wrap all of those exceptions and comment?
     const { comment } = github_1.context.payload;
     if (!comment) {
         console.error('No comment object found');
@@ -40222,6 +40266,7 @@ async function run() {
     }
     // this bot runs only in PR environment
     if (!github_1.context.payload?.issue?.node_id.startsWith('PR')) {
+        // TODO comment the issue, saying that
         console.log('skipping issues, context should be a PR', github_1.context.payload?.issue);
         return;
     }
