@@ -15,6 +15,9 @@ inputs:
     description: The username of the bot
     required: false
     default: bot
+  code_path:
+    description: Path of project's code
+    required: false
 
 runs:
   using: node20
