@@ -33919,10 +33919,11 @@ exports["default"] = run;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ZAPIER_API_URL = exports.ENABLED_CHANNELS = exports.CHANNELS = exports.MAINTAINERS_TEAM = exports.CODE_PATH = exports.BOT_USERNAME = void 0;
+exports.ZAPIER_API_URL = exports.ENABLED_CHANNELS = exports.CHANNELS = exports.MAINTAINERS_TEAM = exports.DB_FILE = exports.CODE_PATH = exports.BOT_USERNAME = void 0;
 const core_1 = __nccwpck_require__(2186);
 exports.BOT_USERNAME = process.env.BOT_USERNAME || (0, core_1.getInput)('username');
 exports.CODE_PATH = '/home/runner/work/test-bot/test-bot/code' || 0;
+exports.DB_FILE = 'public/db.json' || 0;
 exports.MAINTAINERS_TEAM = 'enovitae/maintainers';
 exports.CHANNELS = ['whatsapp', 'telegram', 'pinterest', 'zapier'];
 exports.ENABLED_CHANNELS = ['zapier'];
@@ -33951,15 +33952,60 @@ exports["default"] = (0, github_1.getOctokit)(githubToken, { request: fetch }).r
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.checkFSAccess = void 0;
+exports.checkFSAccess = exports.readOrCreateDB = void 0;
 const fs_1 = __nccwpck_require__(7147);
 const config_1 = __nccwpck_require__(6373);
+const createDB = () => {
+    (0, fs_1.writeFileSync)(`${config_1.CODE_PATH}/${config_1.DB_FILE}`, '{}', 'utf8');
+    return '{}';
+};
+function isErrnoException(e) {
+    if ('code' in e)
+        return true;
+    else
+        return false;
+}
+const readOrCreateDB = () => {
+    try {
+        let src = (0, fs_1.readFileSync)(`${config_1.CODE_PATH}/${config_1.DB_FILE}`, 'utf8');
+        // TODO check json integrity, otherwise reset it
+        console.log('trying to read db file', src);
+        if (!src) {
+            //create db
+            src = createDB();
+        }
+        const out = JSON.parse(src);
+        return out;
+    }
+    catch (e) {
+        if (isErrnoException(e) && e.code === 'ENOENT') {
+            const out = JSON.parse(createDB());
+            return out;
+        }
+        else {
+            console.error(e);
+            let error = '';
+            if (typeof e === 'string') {
+                error = e;
+            }
+            else if (e instanceof Error) {
+                error = e.message;
+            }
+            return new Error(error);
+        }
+    }
+};
+exports.readOrCreateDB = readOrCreateDB;
 const checkFSAccess = () => {
-    const dir = (0, fs_1.readdirSync)(`${config_1.CODE_PATH}`, 'utf8');
-    console.log(JSON.stringify(dir));
-    const src = (0, fs_1.readFileSync)(`${config_1.CODE_PATH}/db.json`, 'utf8');
-    console.log('trying to read a sample project file', src);
-    return !!src;
+    console.log(config_1.CODE_PATH);
+    try {
+        (0, fs_1.accessSync)(`${config_1.CODE_PATH}`, fs_1.constants.R_OK | fs_1.constants.W_OK);
+        return true;
+    }
+    catch (err) {
+        console.error('no access!', err);
+        return false;
+    }
 };
 exports.checkFSAccess = checkFSAccess;
 

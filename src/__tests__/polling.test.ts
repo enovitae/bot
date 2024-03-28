@@ -1,19 +1,24 @@
-import fs, { Dirent, constants } from 'fs'
+describe('manage db file', () => {
+  jest.mock('../config', () => ({ CODE_PATH: '/tmp', DB_FILE: 'db.json' }))
+  const { checkFSAccess, readOrCreateDB } = require('../poller')
 
-export const getDirectoryFiles = async (directory: string) => {
-  return fs
-    .readdirSync(directory, { withFileTypes: true })
-    .filter(dirent => !dirent.isDirectory())
-    .map(dirent => dirent.name)
-}
-
-describe('76733429', () => {
-  test('should pass', async () => {
-    const directory = new Dirent('directory', constants.UV_DIRENT_DIR)
-    const fsMock = jest.spyOn(fs, 'readdirSync')
-    fsMock.mockReturnValue([directory])
-    const files = await getDirectoryFiles('/dir/stuff')
-    expect(files).not.toBeNull
-    fsMock.mockRestore()
+  test('check fs access', () => {
+    expect(checkFSAccess()).toBeTruthy()
   })
+  test('open or create db', () => {
+    expect(readOrCreateDB()).toEqual({})
+  })
+  jest.resetModules()
+})
+describe('manage failure db file', () => {
+  jest.mock('../config', () => ({ CODE_PATH: '/root', DB_FILE: 'db.json' }))
+  const { checkFSAccess, readOrCreateDB } = require('../poller')
+
+  test('check fs access', () => {
+    expect(checkFSAccess()).toBeFalsy()
+  })
+  test('open or create db', () => {
+    expect(readOrCreateDB()).toBeInstanceOf(Error)
+  })
+  jest.resetModules()
 })
