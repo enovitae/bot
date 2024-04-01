@@ -98,13 +98,14 @@ export const getGitDataFromFile = (file: string): Date => {
 }
 
 export const scanContent = (db: DbSchema): DbSchema | Error => {
-  console.log(CONTENT_PATH)
+  const contentPath = `${CODE_PATH}/${CONTENT_PATH}`
+  console.log('content path', contentPath)
   try {
-    accessSync(`${CONTENT_PATH}`, constants.R_OK)
+    accessSync(contentPath, constants.R_OK)
   } catch (error) {
     return new Error()
   }
-  const files = globSync(`${CONTENT_PATH}/**/*.mdx`)
+  const files = globSync(`${contentPath}/**/*.mdx`)
 
   console.log(files)
 

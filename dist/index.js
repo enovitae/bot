@@ -38843,14 +38843,15 @@ const getGitDataFromFile = (file) => {
 };
 exports.getGitDataFromFile = getGitDataFromFile;
 const scanContent = (db) => {
-    console.log(config_1.CONTENT_PATH);
+    const contentPath = `${config_1.CODE_PATH}/${config_1.CONTENT_PATH}`;
+    console.log('content path', contentPath);
     try {
-        (0, fs_1.accessSync)(`${config_1.CONTENT_PATH}`, fs_1.constants.R_OK);
+        (0, fs_1.accessSync)(contentPath, fs_1.constants.R_OK);
     }
     catch (error) {
         return new Error();
     }
-    const files = (0, glob_1.globSync)(`${config_1.CONTENT_PATH}/**/*.mdx`);
+    const files = (0, glob_1.globSync)(`${contentPath}/**/*.mdx`);
     console.log(files);
     files.map(f => {
         if (!f.endsWith('.mdx')) {
