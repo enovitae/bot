@@ -1,3 +1,5 @@
+import { readFileSync } from 'fs'
+
 beforeEach(() => jest.resetModules())
 describe('manage db file', () => {
   jest.mock('../config', () => ({ CODE_PATH: '/tmp', DB_FILE: 'db.json' }))
@@ -25,26 +27,34 @@ describe('manage failure db file', () => {
   jest.resetModules()
 })
 
-describe('scan content', () => {
-  test('should scan directory', () => {
-    jest.mock('../config', () => ({
-      CODE_PATH: '/tmp',
-      CONTENT_PATH: '.'
-    }))
-    const { scanContent } = require('../poller')
-    scanContent()
-  })
-  jest.resetModules()
-})
-
 describe('fail scan content', () => {
   test('should fail gracefully scanning directory', () => {
+    const CODE_PATH = '/tmp'
+    const CONTENT_PATH = `${CODE_PATH}/unknown/folder`
     jest.mock('../config', () => ({
-      CODE_PATH: '/tmp',
-      CONTENT_PATH: 'unknown/folder'
+      CODE_PATH,
+      CONTENT_PATH
     }))
     const { scanContent } = require('../poller')
-    scanContent()
+    expect(scanContent({})).toBeInstanceOf(Error)
+    jest.resetModules()
   })
-  jest.resetModules()
+  test('should scan directory', () => {
+    const CODE_PATH = '.'
+    const CONTENT_PATH = `${CODE_PATH}/src/__mocks__/content`
+    jest.mock('../config', () => ({
+      CODE_PATH,
+      CONTENT_PATH
+    }))
+    const dbJson = readFileSync('./src/__mocks__/db.json', 'utf-8')
+    const { scanContent } = require('../poller')
+    const db = scanContent({})
+    console.log('db', db)
+    expect(db).toEqual(JSON.parse(dbJson))
+
+    const newDb = scanContent(db)
+    console.log('newDb', newDb)
+    expect(newDb).toEqual(JSON.parse(dbJson))
+    jest.resetModules()
+  })
 })

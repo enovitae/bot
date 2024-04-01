@@ -1,6 +1,10 @@
-import { accessSync, constants, readFileSync, readdirSync, writeFileSync } from 'fs'
+import { accessSync, constants, readFileSync, writeFileSync } from 'fs'
 import { CODE_PATH, CONTENT_PATH, DB_FILE } from './config'
-import { DbSchema } from './utils/types'
+import { DbEntry, DbSchema, Post } from './utils/types'
+import { globSync } from 'glob'
+import fm from 'front-matter'
+import gitlog from 'gitlog'
+import type { GitlogOptions } from 'gitlog'
 
 const createDB = (): string => {
   writeFileSync(`${CODE_PATH}/${DB_FILE}`, '{}', 'utf8')
@@ -26,7 +30,11 @@ export const readOrCreateDB = (): DbSchema | Error => {
 
     return out
   } catch (e) {
-    if (isErrnoException(e) && e.code === 'ENOENT') {
+    if (
+      isErrnoException(e) &&
+      e.code === 'ENOENT' &&
+      checkFSAccess(CODE_PATH)
+    ) {
       const out: DbSchema = JSON.parse(createDB())
       return out
     } else {
@@ -42,9 +50,9 @@ export const readOrCreateDB = (): DbSchema | Error => {
   }
 }
 
-export const checkFSAccess = (): boolean => {
+export const checkFSAccess = (path: string = CODE_PATH): boolean => {
   try {
-    accessSync(`${CODE_PATH}`, constants.R_OK | constants.W_OK)
+    accessSync(`${path}`, constants.R_OK | constants.W_OK)
     return true
   } catch (err) {
     console.error('no access!', err)
@@ -52,20 +60,65 @@ export const checkFSAccess = (): boolean => {
   }
 }
 
-export const scanContent = (): void => {
-  console.log(CONTENT_PATH);
+// TODO test it
+export const compare = (
+  post: Post,
+  postDbFile: DbEntry,
+  filePath: string,
+  db: DbSchema
+): boolean => {
+  // update db whether content is new or publish_date is different
+  // or slug is different
+  return (
+    !(filePath in db) ||
+    post.publish_date !== postDbFile.publish_date ||
+    post.slug !== postDbFile.slug
+  )
+}
+
+// TODO test it
+export const extractFrontmatter = (file: string): Post => {
+  const content = readFileSync(file, 'utf-8')
+  const attrs = fm(content).attributes as Post
+  return attrs
+}
+
+export const getGitDataFromFile = (file: string): Date => {
+  const options: GitlogOptions<'committerDate'> = {
+    repo: CODE_PATH,
+    file,
+    fields: ['committerDate']
+  }
+  console.log(gitlog(options))
+  const committerDate = gitlog(options).at(0)
+    ? gitlog(options).at(0)?.committerDate
+    : ''
+  const cd = committerDate ? new Date(committerDate) : new Date()
+  return new Date(cd)
+}
+
+export const scanContent = (db: DbSchema): DbSchema | Error => {
+  console.log(CONTENT_PATH)
   try {
     accessSync(`${CONTENT_PATH}`, constants.R_OK)
   } catch (error) {
     return new Error()
   }
-  const files = readdirSync(CONTENT_PATH, 'utf-8')
+  const files = globSync(`${CONTENT_PATH}/**/*.mdx`)
+
+  console.log(files)
+
   files.map(f => {
-    if(!f.endsWith('.mdx')) {
+    if (!f.endsWith('.mdx')) {
       return
     }
     const filePath = `${CODE_PATH}/${f}`
-    console.log(filePath);
-    
+    const post = extractFrontmatter(filePath)
+    const postDbFile = f in db ? db[f] : null
+    console.log(post, postDbFile)
+    const lastModified = getGitDataFromFile(f)
+    console.log('lastModified', lastModified)
+    db[f] = { last_modified: lastModified.toJSON(), ...post }
   })
+  return db
 }
