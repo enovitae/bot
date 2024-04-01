@@ -38587,11 +38587,18 @@ const poller_1 = __nccwpck_require__(1072);
 const fs_1 = __nccwpck_require__(7147);
 async function run(context) {
     const template = (0, fs_1.readFileSync)(__nccwpck_require__.ab + "polling.md", 'utf8');
-    const checkFS = (0, poller_1.checkFSAccess)();
-    await (0, bot_1.commentToIssue)(context, template, {
-        diff: 'check logs'
-    });
-    return checkFS ? 'ok' : 'ko';
+    const db = (0, poller_1.readOrCreateDB)();
+    if (db instanceof Error) {
+        console.error('error accessing db', db);
+        return 'ko';
+    }
+    else {
+        const out = (0, poller_1.scanContent)(db);
+        await (0, bot_1.commentToIssue)(context, template, {
+            diff: JSON.stringify(out)
+        });
+        return 'ok';
+    }
 }
 exports["default"] = run;
 
