@@ -24,6 +24,8 @@ export const readOrCreateDB = (): DbSchema | Error => {
     console.log('trying to read db file', src)
     if (!src) {
       //create db
+      console.log('db not found, creating one...')
+
       src = createDB()
     }
     const out: DbSchema = JSON.parse(src)
@@ -120,5 +122,6 @@ export const scanContent = (db: DbSchema): DbSchema | Error => {
     console.log('lastModified', lastModified)
     db[f] = { last_modified: lastModified.toJSON(), ...post }
   })
+
   return db
 }

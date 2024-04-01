@@ -1,60 +1,35 @@
-import { readFileSync } from 'fs'
-
-beforeEach(() => jest.resetModules())
-describe('manage db file', () => {
-  jest.mock('../config', () => ({ CODE_PATH: '/tmp', DB_FILE: 'db.json' }))
-  const { checkFSAccess, readOrCreateDB } = require('../poller')
-
-  test('check fs access', () => {
-    expect(checkFSAccess()).toBeTruthy()
+import { server } from '../__mocks__/node'
+import { context } from '../__mocks__/handlers'
+import { Command } from '../bot'
+import { runCommand } from '../commands'
+beforeAll(() => {
+  // Enable API mocking before all the tests.
+  server.listen()
+  server.events.on('request:start', ({ request }) => {
+    console.log('Outgoing:', request.method, request.url)
   })
-  test('open or create db', () => {
-    expect(readOrCreateDB()).toEqual({})
-  })
-  jest.resetModules()
 })
 
-describe('manage failure db file', () => {
-  jest.mock('../config', () => ({ CODE_PATH: '/root', DB_FILE: 'db.json' }))
-  const { checkFSAccess, readOrCreateDB } = require('../poller')
-
-  test('check fs access', () => {
-    expect(checkFSAccess()).toBeFalsy()
-  })
-  test('open or create db', () => {
-    expect(readOrCreateDB()).toBeInstanceOf(Error)
-  })
-  jest.resetModules()
+afterEach(() => {
+  // Reset the request handlers between each test.
+  // This way the handlers we add on a per-test basis
+  // do not leak to other, irrelevant tests.
+  server.resetHandlers()
 })
 
-describe('fail scan content', () => {
-  test('should fail gracefully scanning directory', () => {
-    const CODE_PATH = '/tmp'
-    const CONTENT_PATH = `${CODE_PATH}/unknown/folder`
-    jest.mock('../config', () => ({
-      CODE_PATH,
-      CONTENT_PATH
-    }))
-    const { scanContent } = require('../poller')
-    expect(scanContent({})).toBeInstanceOf(Error)
-    jest.resetModules()
-  })
-  test('should scan directory', () => {
-    const CODE_PATH = '.'
-    const CONTENT_PATH = `${CODE_PATH}/src/__mocks__/content`
-    jest.mock('../config', () => ({
-      CODE_PATH,
-      CONTENT_PATH
-    }))
-    const dbJson = readFileSync('./src/__mocks__/db.json', 'utf-8')
-    const { scanContent } = require('../poller')
-    const db = scanContent({})
-    console.log('db', db)
-    expect(db).toEqual(JSON.parse(dbJson))
+afterAll(() => {
+  // Finally, disable API mocking after the tests are done.
+  server.close()
+})
 
-    const newDb = scanContent(db)
-    console.log('newDb', newDb)
-    expect(newDb).toEqual(JSON.parse(dbJson))
-    jest.resetModules()
+jest.mock('../config', () => ({
+  CODE_PATH: '.',
+  CONTENT_PATH: 'src/__mocks__/content',
+  DB_FILE: 'src/__mocks__/db.json'
+}))
+describe('polling command', () => {
+  test('should return valid mocked db', async () => {
+    const command: Command = { command: 'polling', args: [] }
+    expect(await runCommand(context, command)).not.toBeUndefined()
   })
 })

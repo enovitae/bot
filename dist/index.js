@@ -38585,6 +38585,20 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const bot_1 = __nccwpck_require__(8104);
 const poller_1 = __nccwpck_require__(1072);
 const fs_1 = __nccwpck_require__(7147);
+function printDbSchemaFields(dbSchema) {
+    let str = '';
+    for (const key in dbSchema) {
+        if (Object.prototype.hasOwnProperty.call(dbSchema, key)) {
+            const entry = dbSchema[key]; // Type assertion
+            for (const field in entry) {
+                if (Object.prototype.hasOwnProperty.call(entry, field)) {
+                    str += `${field}: ${entry[field]}\n`;
+                }
+            }
+        }
+    }
+    return str;
+}
 async function run(context) {
     const template = (0, fs_1.readFileSync)(__nccwpck_require__.ab + "polling.md", 'utf8');
     const db = (0, poller_1.readOrCreateDB)();
@@ -38594,9 +38608,15 @@ async function run(context) {
     }
     else {
         const out = (0, poller_1.scanContent)(db);
-        await (0, bot_1.commentToIssue)(context, template, {
-            diff: JSON.stringify(out)
-        });
+        if (!(out instanceof Error)) {
+            await (0, bot_1.commentToIssue)(context, template, {
+                diff: printDbSchemaFields(out)
+            });
+        }
+        else {
+            console.error('error elaborating content', out);
+            return 'ko';
+        }
         return 'ok';
     }
 }
@@ -38775,6 +38795,7 @@ const readOrCreateDB = () => {
         console.log('trying to read db file', src);
         if (!src) {
             //create db
+            console.log('db not found, creating one...');
             src = createDB();
         }
         const out = JSON.parse(src);

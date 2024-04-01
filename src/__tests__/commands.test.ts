@@ -5,7 +5,7 @@ import { runCommand } from '../commands'
 jest.mock('../commands/preview', () => jest.fn(() => 'preview'))
 jest.mock('../commands/publish', () => jest.fn(() => 'publish'))
 jest.mock('../commands/polling', () => jest.fn(() => 'polling'))
-describe('test commands', () => {
+describe('test commands names', () => {
   const validCommands = ['polling', 'publish', 'preview', 'preview zapier']
   test.each(validCommands)('run valid commands', async c => {
     const command: Command = { command: c, args: [] }
