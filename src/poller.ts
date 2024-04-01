@@ -112,8 +112,7 @@ export const scanContent = (db: DbSchema): DbSchema | Error => {
     if (!f.endsWith('.mdx')) {
       return
     }
-    const filePath = `${CODE_PATH}/${f}`
-    const post = extractFrontmatter(filePath)
+    const post = extractFrontmatter(f)
     const postDbFile = f in db ? db[f] : null
     console.log(post, postDbFile)
     const lastModified = getGitDataFromFile(f)

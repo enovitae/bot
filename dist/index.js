@@ -38719,7 +38719,7 @@ exports.ZAPIER_API_URL = exports.ENABLED_CHANNELS = exports.CHANNELS = exports.M
 const core_1 = __nccwpck_require__(2186);
 exports.BOT_USERNAME = process.env.BOT_USERNAME || (0, core_1.getInput)('username');
 exports.CODE_PATH = '/home/runner/work/test-bot/test-bot/code' || 0;
-exports.CONTENT_PATH = `${exports.CODE_PATH}/src/content` || (0, core_1.getInput)('content_path');
+exports.CONTENT_PATH = `src/content` || 0;
 exports.DB_FILE = 'public/db.json' || 0;
 exports.MAINTAINERS_TEAM = 'enovitae/maintainers';
 exports.CHANNELS = ['whatsapp', 'telegram', 'pinterest', 'zapier'];
@@ -38856,8 +38856,7 @@ const scanContent = (db) => {
         if (!f.endsWith('.mdx')) {
             return;
         }
-        const filePath = `${config_1.CODE_PATH}/${f}`;
-        const post = (0, exports.extractFrontmatter)(filePath);
+        const post = (0, exports.extractFrontmatter)(f);
         const postDbFile = f in db ? db[f] : null;
         console.log(post, postDbFile);
         const lastModified = (0, exports.getGitDataFromFile)(f);
