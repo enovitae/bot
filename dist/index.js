@@ -38585,39 +38585,47 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const bot_1 = __nccwpck_require__(8104);
 const poller_1 = __nccwpck_require__(1072);
 const fs_1 = __nccwpck_require__(7147);
-function printDbSchemaFields(dbSchema) {
+// function printDbSchemaFields(dbSchema: DbSchema): string {
+//   let str = ''
+//   for (const key in dbSchema) {
+//     if (Object.prototype.hasOwnProperty.call(dbSchema, key)) {
+//       const entry = dbSchema[key] // Type assertion
+//       for (const field in entry) {
+//         if (Object.prototype.hasOwnProperty.call(entry, field)) {
+//           type e = keyof DbEntry
+//           str += `${field}: ${entry[field as e]}\n`
+//         }
+//       }
+//     }
+//   }
+//   return str
+// }
+function prettyPrint(dbSchema) {
     let str = '';
-    for (const key in dbSchema) {
-        if (Object.prototype.hasOwnProperty.call(dbSchema, key)) {
-            const entry = dbSchema[key]; // Type assertion
-            for (const field in entry) {
-                if (Object.prototype.hasOwnProperty.call(entry, field)) {
-                    str += `${field}: ${entry[field]}\n`;
-                }
-            }
-        }
+    for (const k in dbSchema) {
+        const entry = dbSchema[k];
+        str += `![${entry.alt}](${entry.splash} "${entry.title}")`;
+        str += `🍾 ${entry.title}`;
+        str += `🥂 ${entry.description}`;
+        str += `👉 [https://enovitae.com/${entry.slug}](https://enovitae.com/${entry.slug})`;
+        str += `
+    
+    `;
     }
     return str;
 }
 async function run(context) {
     const template = (0, fs_1.readFileSync)(__nccwpck_require__.ab + "polling.md", 'utf8');
-    const db = (0, poller_1.readOrCreateDB)();
-    if (db instanceof Error) {
-        console.error('error accessing db', db);
-        return 'ko';
+    const out = (0, poller_1.polling)();
+    if (!(out instanceof Error)) {
+        await (0, bot_1.commentToIssue)(context, template, {
+            md: prettyPrint(out)
+        });
+        return 'ok';
     }
     else {
-        const out = (0, poller_1.scanContent)(db);
-        if (!(out instanceof Error)) {
-            await (0, bot_1.commentToIssue)(context, template, {
-                diff: printDbSchemaFields(out)
-            });
-        }
-        else {
-            console.error('error elaborating content', out);
-            return 'ko';
-        }
-        return 'ok';
+        console.error('error elaborating content', out);
+        return 'ko';
     }
 }
 exports["default"] = run;
@@ -38685,10 +38693,7 @@ const preview_1 = __nccwpck_require__(3727);
 const runPublish = async (args, whatChanged, context, template) => {
     if (args && args?.length > 0 && config_1.CHANNELS.some(c => c === args[0])) {
         const res = await (0, channels_1.send)({ channel: args[0], message: whatChanged });
-        if ('data' in res) {
-            console.log(res.data, res.status);
-        }
-        else {
+        if (!('data' in res)) {
             console.error(res.message, res.status);
             const errorTpl = (0, fs_1.readFileSync)(__nccwpck_require__.ab + "errors.md", 'utf8');
             await (0, bot_1.commentToIssue)(context, errorTpl, { errors: res.message });
@@ -38711,8 +38716,6 @@ async function run(context, args) {
     const template = (0, fs_1.readFileSync)(__nccwpck_require__.ab + "publish.md", 'utf8');
     (0, bot_1.reactToComment)(context);
     const diff = await (0, bot_1.getPullDiff)(context);
-    // TODO remove
-    console.log(diff);
     const whatChanged = (0, preview_1.analyzeDiff)(diff);
     // I expect channel as first parameter
     // TODO ugly
@@ -38772,7 +38775,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.scanContent = exports.getGitDataFromFile = exports.extractFrontmatter = exports.compare = exports.checkFSAccess = exports.readOrCreateDB = void 0;
+exports.polling = exports.scanContent = exports.getGitDataFromFile = exports.extractFrontmatter = exports.compare = exports.checkFSAccess = exports.readOrCreateDB = void 0;
 const fs_1 = __nccwpck_require__(7147);
 const config_1 = __nccwpck_require__(6373);
 const glob_1 = __nccwpck_require__(8211);
@@ -38855,7 +38858,6 @@ const getGitDataFromFile = (file) => {
         file,
         fields: ['committerDate']
     };
-    console.log((0, gitlog_1.default)(options));
     const committerDate = (0, gitlog_1.default)(options).at(0)
         ? (0, gitlog_1.default)(options).at(0)?.committerDate
         : '';
@@ -38873,21 +38875,29 @@ const scanContent = (db) => {
         return new Error();
     }
     const files = (0, glob_1.globSync)(`${contentPath}/**/*.mdx`);
-    console.log(files);
     files.map(f => {
         if (!f.endsWith('.mdx')) {
             return;
         }
         const post = (0, exports.extractFrontmatter)(f);
-        const postDbFile = f in db ? db[f] : null;
-        console.log(post, postDbFile);
         const lastModified = (0, exports.getGitDataFromFile)(f);
-        console.log('lastModified', lastModified);
         db[f] = { last_modified: lastModified.toJSON(), ...post };
     });
     return db;
 };
 exports.scanContent = scanContent;
+const polling = () => {
+    const db = (0, exports.readOrCreateDB)();
+    if (db instanceof Error) {
+        console.error('error accessing db', db);
+        return db;
+    }
+    else {
+        const out = (0, exports.scanContent)(db);
+        return out;
+    }
+};
+exports.polling = polling;
 
 
 /***/ }),

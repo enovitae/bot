@@ -14,9 +14,7 @@ export const runPublish = async (
 ): Promise<boolean> => {
   if (args && args?.length > 0 && CHANNELS.some(c => c === args[0])) {
     const res = await send({ channel: args[0], message: whatChanged })
-    if ('data' in res) {
-      console.log(res.data, res.status)
-    } else {
+    if (!('data' in res)) {
       console.error(res.message, res.status)
       const errorTpl = readFileSync(
         `${__dirname}/../templates/errors.md`,
@@ -46,8 +44,6 @@ export default async function run(
 
   reactToComment(context)
   const diff = await (getPullDiff(context) as Promise<string>)
-  // TODO remove
-  console.log(diff)
   const whatChanged = analyzeDiff(diff)
 
   // I expect channel as first parameter

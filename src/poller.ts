@@ -91,7 +91,6 @@ export const getGitDataFromFile = (file: string): Date => {
     file,
     fields: ['committerDate']
   }
-  console.log(gitlog(options))
   const committerDate = gitlog(options).at(0)
     ? gitlog(options).at(0)?.committerDate
     : ''
@@ -109,19 +108,25 @@ export const scanContent = (db: DbSchema): DbSchema | Error => {
   }
   const files = globSync(`${contentPath}/**/*.mdx`)
 
-  console.log(files)
-
   files.map(f => {
     if (!f.endsWith('.mdx')) {
       return
     }
     const post = extractFrontmatter(f)
-    const postDbFile = f in db ? db[f] : null
-    console.log(post, postDbFile)
     const lastModified = getGitDataFromFile(f)
-    console.log('lastModified', lastModified)
     db[f] = { last_modified: lastModified.toJSON(), ...post }
   })
 
   return db
+}
+
+export const polling = (): DbSchema | Error => {
+  const db = readOrCreateDB()
+  if (db instanceof Error) {
+    console.error('error accessing db', db)
+    return db
+  } else {
+    const out = scanContent(db)
+    return out
+  }
 }

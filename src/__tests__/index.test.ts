@@ -16,9 +16,10 @@ import { OctokitResponse } from '@octokit/types'
 beforeAll(() => {
   // Enable API mocking before all the tests.
   server.listen()
-  server.events.on('request:start', ({ request }) => {
-    console.log('Outgoing:', request.method, request.url)
-  })
+  // Debug
+  // server.events.on('request:start', ({ request }) => {
+  //   console.log('Outgoing:', request.method, request.url)
+  // })
 })
 
 afterEach(() => {
@@ -41,9 +42,6 @@ it('receives a mocked response to a REST API request using custom type', async (
   const diff = await (getPullDiff(context) as Promise<
     OctokitResponse<string, number>
   >)
-  if (diff) {
-    console.log(diff.data)
-  }
   expect(diff.data).toEqual(diffJSON.data)
 
   const diffText = analyzeDiff(diff.data)

@@ -5,9 +5,10 @@ import { runCommand } from '../commands'
 beforeAll(() => {
   // Enable API mocking before all the tests.
   server.listen()
-  server.events.on('request:start', ({ request }) => {
-    console.log('Outgoing:', request.method, request.url)
-  })
+  // Debug
+  // server.events.on('request:start', ({ request }) => {
+  //   console.log('Outgoing:', request.method, request.url)
+  // })
 })
 
 afterEach(() => {
