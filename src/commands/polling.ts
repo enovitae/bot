@@ -24,13 +24,17 @@ function prettyPrint(dbSchema: DbSchema): string {
   let str = ''
   for (const k in dbSchema) {
     const entry = dbSchema[k]
-    str += `![${entry.alt}](${entry.splash} "${entry.title}")`
-    str += `🍾 ${entry.title}`
-    str += `🥂 ${entry.description}`
-    str += `👉 [https://enovitae.com/${entry.slug}](https://enovitae.com/${entry.slug})`
+
+    str += `<img src="https://enovitae.com/${entry.splash.replace('../../../', '')}" width="250" alt="${entry.alt}">
+`
+    str += `🍾 ${entry.title}
+`
+    str += `🥂 ${entry.description}
+`
+    str += `👉 [https://enovitae.com${entry.slug}](https://enovitae.com${entry.slug})`
     str += `
-    
-    `
+
+`
   }
   return str
 }
