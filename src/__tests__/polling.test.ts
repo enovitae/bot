@@ -8,6 +8,7 @@ beforeAll(() => {
   // Debug
   // server.events.on('request:start', ({ request }) => {
   //   console.log('Outgoing:', request.method, request.url)
+  //   request.json().then(console.log)
   // })
 })
 
