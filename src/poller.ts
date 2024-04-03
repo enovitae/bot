@@ -6,9 +6,9 @@ import fm from 'front-matter'
 import gitlog from 'gitlog'
 import type { GitlogOptions } from 'gitlog'
 
-const createDB = (): string => {
-  writeFileSync(`${CODE_PATH}/${DB_FILE}`, '{}', 'utf8')
-  return '{}'
+const writeOrCreateDB = (db: DbSchema = {}): string => {
+  writeFileSync(`${CODE_PATH}/${DB_FILE}`, JSON.stringify(db), 'utf8')
+  return JSON.stringify(db)
 }
 
 function isErrnoException(e: unknown): e is NodeJS.ErrnoException {
@@ -26,7 +26,7 @@ export const readOrCreateDB = (): DbSchema | Error => {
       //create db
       console.log('db not found, creating one...')
 
-      src = createDB()
+      src = writeOrCreateDB()
     }
     const out: DbSchema = JSON.parse(src)
 
@@ -37,7 +37,7 @@ export const readOrCreateDB = (): DbSchema | Error => {
       e.code === 'ENOENT' &&
       checkFSAccess(CODE_PATH)
     ) {
-      const out: DbSchema = JSON.parse(createDB())
+      const out: DbSchema = JSON.parse(writeOrCreateDB())
       return out
     } else {
       console.error(e)
@@ -127,6 +127,9 @@ export const polling = (): DbSchema | Error => {
     return db
   } else {
     const out = scanContent(db)
+    if (!(out instanceof Error)) {
+      writeOrCreateDB(out)
+    }
     return out
   }
 }

@@ -6,6 +6,13 @@ import { runCommand } from './commands'
 export async function run(): Promise<undefined> {
   // TODO: wrap all of those exceptions and comment?
 
+  // TODO: intercept merge PR event on main branch when content dir has edits
+  // run polling command, update database
+  // create a PR using https://github.com/peter-evans/create-pull-request
+  // in this new PR you can issue @bot preview and @bot publish
+  // remember: git checkout in gh action must be based on main branch
+  // in order to be able to compare stable (old) db with new content
+
   const { comment } = context.payload
   if (!comment) {
     console.error('No comment object found')
