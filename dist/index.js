@@ -38784,9 +38784,9 @@ const config_1 = __nccwpck_require__(6373);
 const glob_1 = __nccwpck_require__(8211);
 const front_matter_1 = __importDefault(__nccwpck_require__(7646));
 const gitlog_1 = __importDefault(__nccwpck_require__(1022));
-const createDB = () => {
-    (0, fs_1.writeFileSync)(`${config_1.CODE_PATH}/${config_1.DB_FILE}`, '{}', 'utf8');
-    return '{}';
+const writeOrCreateDB = (db = {}) => {
+    (0, fs_1.writeFileSync)(`${config_1.CODE_PATH}/${config_1.DB_FILE}`, JSON.stringify(db), 'utf8');
+    return JSON.stringify(db);
 };
 function isErrnoException(e) {
     if ('code' in e)
@@ -38802,7 +38802,7 @@ const readOrCreateDB = () => {
         if (!src) {
             //create db
             console.log('db not found, creating one...');
-            src = createDB();
+            src = writeOrCreateDB();
         }
         const out = JSON.parse(src);
         return out;
@@ -38811,7 +38811,7 @@ const readOrCreateDB = () => {
         if (isErrnoException(e) &&
             e.code === 'ENOENT' &&
             (0, exports.checkFSAccess)(config_1.CODE_PATH)) {
-            const out = JSON.parse(createDB());
+            const out = JSON.parse(writeOrCreateDB());
             return out;
         }
         else {
@@ -38897,6 +38897,9 @@ const polling = () => {
     }
     else {
         const out = (0, exports.scanContent)(db);
+        if (!(out instanceof Error)) {
+            writeOrCreateDB(out);
+        }
         return out;
     }
 };
@@ -52969,6 +52972,18 @@ const bot_1 = __nccwpck_require__(8104);
 const commands_1 = __nccwpck_require__(4362);
 async function run() {
     // TODO: wrap all of those exceptions and comment?
+    // TODO: intercept merge PR event on main branch when content dir has edits
+    // run polling command, update database
+    // create a PR using https://github.com/peter-evans/create-pull-request
+    // in this new PR you can issue @bot preview and @bot publish
+    // remember: git checkout in gh action must be based on main branch
+    // in order to be able to compare stable (old) db with new content
+    console.log(github_1.context);
+    if (github_1.context.eventName === 'push') {
+        console.log('push event, running polling');
+        const pollingCommand = { command: 'd', args: [] };
+        await (0, commands_1.runCommand)(github_1.context, pollingCommand);
+    }
     const { comment } = github_1.context.payload;
     if (!comment) {
         console.error('No comment object found');

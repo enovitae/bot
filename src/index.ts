@@ -1,6 +1,6 @@
 import { context } from '@actions/github'
 import { BOT_USERNAME } from './config'
-import { getCommandsFromComment, isMaintainer } from './bot'
+import { Command, getCommandsFromComment, isMaintainer } from './bot'
 import { runCommand } from './commands'
 
 export async function run(): Promise<undefined> {
@@ -12,6 +12,13 @@ export async function run(): Promise<undefined> {
   // in this new PR you can issue @bot preview and @bot publish
   // remember: git checkout in gh action must be based on main branch
   // in order to be able to compare stable (old) db with new content
+  console.log(context)
+  if (context.eventName === 'push') {
+    console.log('push event, running polling')
+
+    const pollingCommand: Command = { command: 'd', args: [] }
+    await runCommand(context, pollingCommand)
+  }
 
   const { comment } = context.payload
   if (!comment) {
