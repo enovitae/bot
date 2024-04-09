@@ -16,8 +16,9 @@ export async function run(): Promise<undefined> {
   if (context.eventName === 'push') {
     console.log('push event, running polling')
 
-    const pollingCommand: Command = { command: 'd', args: [] }
+    const pollingCommand: Command = { command: 'polling', args: [] }
     await runCommand(context, pollingCommand)
+    return
   }
 
   const { comment } = context.payload

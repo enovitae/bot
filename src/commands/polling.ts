@@ -1,8 +1,4 @@
-import { DbSchema } from 'src/utils/types'
-import { commentToIssue } from '../bot'
 import { polling } from '../poller'
-import { Context } from '@actions/github/lib/context'
-import { readFileSync } from 'fs'
 
 // function printDbSchemaFields(dbSchema: DbSchema): string {
 //   let str = ''
@@ -20,32 +16,33 @@ import { readFileSync } from 'fs'
 //   return str
 // }
 
-function prettyPrint(dbSchema: DbSchema): string {
-  let str = ''
-  for (const k in dbSchema) {
-    const entry = dbSchema[k]
+// function prettyPrint(dbSchema: DbSchema): string {
+//   let str = ''
+//   for (const k in dbSchema) {
+//     const entry = dbSchema[k]
 
-    str += `<img src="https://enovitae.com/${entry.splash.replace('../../../', '')}" width="250" alt="${entry.alt}">
-`
-    str += `🍾 ${entry.title}
-`
-    str += `🥂 ${entry.description}
-`
-    str += `👉 [https://enovitae.com${entry.slug}](https://enovitae.com${entry.slug})`
-    str += `
+//     str += `<img src="https://enovitae.com/${entry.splash.replace('../../../', '')}" width="250" alt="${entry.alt}">
+// `
+//     str += `🍾 ${entry.title}
+// `
+//     str += `🥂 ${entry.description}
+// `
+//     str += `👉 [https://enovitae.com${entry.slug}](https://enovitae.com${entry.slug})`
+//     str += `
 
-`
-  }
-  return str
-}
+// `
+//   }
+//   return str
+// }
 
-export default async function run(context: Context): Promise<string> {
-  const template = readFileSync(`${__dirname}/../templates/polling.md`, 'utf8')
+export default async function run(): Promise<string> {
+  // const template = readFileSync(`${__dirname}/../templates/polling.md`, 'utf8')
   const out = polling()
   if (!(out instanceof Error)) {
-    await commentToIssue(context, template, {
-      md: prettyPrint(out)
-    })
+    //FIXME disable comment when invoked from push event, no issue/pr exists though
+    // await commentToIssue(context, template, {
+    //   md: prettyPrint(out)
+    // })
     return 'ok'
   } else {
     console.error('error elaborating content', out)

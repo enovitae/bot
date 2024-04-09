@@ -38582,9 +38582,7 @@ exports.runCommand = runCommand;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const bot_1 = __nccwpck_require__(8104);
 const poller_1 = __nccwpck_require__(1072);
-const fs_1 = __nccwpck_require__(7147);
 // function printDbSchemaFields(dbSchema: DbSchema): string {
 //   let str = ''
 //   for (const key in dbSchema) {
@@ -38600,30 +38598,30 @@ const fs_1 = __nccwpck_require__(7147);
 //   }
 //   return str
 // }
-function prettyPrint(dbSchema) {
-    let str = '';
-    for (const k in dbSchema) {
-        const entry = dbSchema[k];
-        str += `<img src="https://enovitae.com/${entry.splash.replace('../../../', '')}" width="250" alt="${entry.alt}">
-`;
-        str += `🍾 ${entry.title}
-`;
-        str += `🥂 ${entry.description}
-`;
-        str += `👉 [https://enovitae.com${entry.slug}](https://enovitae.com${entry.slug})`;
-        str += `
-
-`;
-    }
-    return str;
-}
-async function run(context) {
-    const template = (0, fs_1.readFileSync)(__nccwpck_require__.ab + "polling.md", 'utf8');
+// function prettyPrint(dbSchema: DbSchema): string {
+//   let str = ''
+//   for (const k in dbSchema) {
+//     const entry = dbSchema[k]
+//     str += `<img src="https://enovitae.com/${entry.splash.replace('../../../', '')}" width="250" alt="${entry.alt}">
+// `
+//     str += `🍾 ${entry.title}
+// `
+//     str += `🥂 ${entry.description}
+// `
+//     str += `👉 [https://enovitae.com${entry.slug}](https://enovitae.com${entry.slug})`
+//     str += `
+// `
+//   }
+//   return str
+// }
+async function run() {
+    // const template = readFileSync(`${__dirname}/../templates/polling.md`, 'utf8')
     const out = (0, poller_1.polling)();
     if (!(out instanceof Error)) {
-        await (0, bot_1.commentToIssue)(context, template, {
-            md: prettyPrint(out)
-        });
+        //FIXME disable comment when invoked from push event, no issue/pr exists though
+        // await commentToIssue(context, template, {
+        //   md: prettyPrint(out)
+        // })
         return 'ok';
     }
     else {
@@ -52981,8 +52979,9 @@ async function run() {
     console.log(github_1.context);
     if (github_1.context.eventName === 'push') {
         console.log('push event, running polling');
-        const pollingCommand = { command: 'd', args: [] };
+        const pollingCommand = { command: 'polling', args: [] };
         await (0, commands_1.runCommand)(github_1.context, pollingCommand);
+        return;
     }
     const { comment } = github_1.context.payload;
     if (!comment) {
