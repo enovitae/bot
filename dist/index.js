@@ -38598,22 +38598,6 @@ const poller_1 = __nccwpck_require__(1072);
 //   }
 //   return str
 // }
-// function prettyPrint(dbSchema: DbSchema): string {
-//   let str = ''
-//   for (const k in dbSchema) {
-//     const entry = dbSchema[k]
-//     str += `<img src="https://enovitae.com/${entry.splash.replace('../../../', '')}" width="250" alt="${entry.alt}">
-// `
-//     str += `🍾 ${entry.title}
-// `
-//     str += `🥂 ${entry.description}
-// `
-//     str += `👉 [https://enovitae.com${entry.slug}](https://enovitae.com${entry.slug})`
-//     str += `
-// `
-//   }
-//   return str
-// }
 async function run() {
     // const template = readFileSync(`${__dirname}/../templates/polling.md`, 'utf8')
     const out = (0, poller_1.polling)();

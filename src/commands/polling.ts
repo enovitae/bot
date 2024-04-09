@@ -16,25 +16,6 @@ import { polling } from '../poller'
 //   return str
 // }
 
-// function prettyPrint(dbSchema: DbSchema): string {
-//   let str = ''
-//   for (const k in dbSchema) {
-//     const entry = dbSchema[k]
-
-//     str += `<img src="https://enovitae.com/${entry.splash.replace('../../../', '')}" width="250" alt="${entry.alt}">
-// `
-//     str += `🍾 ${entry.title}
-// `
-//     str += `🥂 ${entry.description}
-// `
-//     str += `👉 [https://enovitae.com${entry.slug}](https://enovitae.com${entry.slug})`
-//     str += `
-
-// `
-//   }
-//   return str
-// }
-
 export default async function run(): Promise<string> {
   // const template = readFileSync(`${__dirname}/../templates/polling.md`, 'utf8')
   const out = polling()
