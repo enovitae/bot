@@ -1,10 +1,11 @@
 import { readFileSync } from 'fs'
 import { Context } from '@actions/github/lib/context'
 
-import { reactToComment, commentToIssue, addLabels, getPullDiff } from '../bot'
+import { reactToComment, commentToIssue, addLabels } from '../bot'
 import { send } from '../channels'
 import { CHANNELS, ENABLED_CHANNELS } from '../config'
-import { analyzeDiff } from './preview'
+import { prettyPrint } from './preview'
+import { getLastUpdatedDBElements, readDB } from '../poller'
 
 export const runPublish = async (
   args: string[],
@@ -43,15 +44,42 @@ export default async function run(
   const template = readFileSync(`${__dirname}/../templates/publish.md`, 'utf8')
 
   reactToComment(context)
-  const diff = await (getPullDiff(context) as Promise<string>)
-  const whatChanged = analyzeDiff(diff)
 
-  // I expect channel as first parameter
-  // TODO ugly
-  if (args) {
-    runPublish(args, whatChanged, context, template)
+  const db = readDB()
+  if (db instanceof Error) {
+    await commentToIssue(context, template, {
+      text: 'sorry, no db detected',
+      channels: ENABLED_CHANNELS.join(' ')
+    })
+    console.error(db.message)
   } else {
-    console.log('args not valid', args)
+    const filteredDB = getLastUpdatedDBElements(db)
+    if (filteredDB) {
+      // I expect channel as first parameter
+      // TODO ugly
+      if (args) {
+        for (const k in filteredDB) {
+          const entry = filteredDB[k]
+          runPublish(args, prettyPrint({ [k]: entry }), context, template)
+        }
+        await commentToIssue(context, template, {
+          text: prettyPrint(filteredDB),
+          channels: ENABLED_CHANNELS.join(' ')
+        })
+      } else {
+        await commentToIssue(context, template, {
+          text: 'sorry, argument specified for command is not valid',
+          channels: ENABLED_CHANNELS.join(' ')
+        })
+        console.error('args not valid', args)
+      }
+    } else {
+      await commentToIssue(context, template, {
+        text: 'sorry, no new element detected, check last_update in db',
+        channels: ENABLED_CHANNELS.join(' ')
+      })
+      console.error(db)
+    }
   }
   return template
 }

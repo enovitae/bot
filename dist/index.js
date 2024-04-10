@@ -38690,6 +38690,7 @@ const bot_1 = __nccwpck_require__(8104);
 const channels_1 = __nccwpck_require__(6377);
 const config_1 = __nccwpck_require__(6373);
 const preview_1 = __nccwpck_require__(3727);
+const poller_1 = __nccwpck_require__(1072);
 const runPublish = async (args, whatChanged, context, template) => {
     if (args && args?.length > 0 && config_1.CHANNELS.some(c => c === args[0])) {
         const res = await (0, channels_1.send)({ channel: args[0], message: whatChanged });
@@ -38715,15 +38716,44 @@ exports.runPublish = runPublish;
 async function run(context, args) {
     const template = (0, fs_1.readFileSync)(__nccwpck_require__.ab + "publish.md", 'utf8');
     (0, bot_1.reactToComment)(context);
-    const diff = await (0, bot_1.getPullDiff)(context);
-    const whatChanged = (0, preview_1.analyzeDiff)(diff);
-    // I expect channel as first parameter
-    // TODO ugly
-    if (args) {
-        (0, exports.runPublish)(args, whatChanged, context, template);
+    const db = (0, poller_1.readDB)();
+    if (db instanceof Error) {
+        await (0, bot_1.commentToIssue)(context, template, {
+            text: 'sorry, no db detected',
+            channels: config_1.ENABLED_CHANNELS.join(' ')
+        });
+        console.error(db.message);
     }
     else {
-        console.log('args not valid', args);
+        const filteredDB = (0, poller_1.getLastUpdatedDBElements)(db);
+        if (filteredDB) {
+            // I expect channel as first parameter
+            // TODO ugly
+            if (args) {
+                for (const k in filteredDB) {
+                    const entry = filteredDB[k];
+                    (0, exports.runPublish)(args, (0, preview_1.prettyPrint)({ [k]: entry }), context, template);
+                }
+                await (0, bot_1.commentToIssue)(context, template, {
+                    text: (0, preview_1.prettyPrint)(filteredDB),
+                    channels: config_1.ENABLED_CHANNELS.join(' ')
+                });
+            }
+            else {
+                await (0, bot_1.commentToIssue)(context, template, {
+                    text: 'sorry, argument specified for command is not valid',
+                    channels: config_1.ENABLED_CHANNELS.join(' ')
+                });
+                console.error('args not valid', args);
+            }
+        }
+        else {
+            await (0, bot_1.commentToIssue)(context, template, {
+                text: 'sorry, no new element detected, check last_update in db',
+                channels: config_1.ENABLED_CHANNELS.join(' ')
+            });
+            console.error(db);
+        }
     }
     return template;
 }
