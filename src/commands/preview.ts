@@ -54,6 +54,11 @@ export default async function run(context: Context): Promise<string> {
         diff: prettyPrint(filteredDB),
         channels: ENABLED_CHANNELS.join(' ')
       })
+    } else {
+      await commentToIssue(context, template, {
+        diff: 'sorry, no new element detected, check last_update in db',
+        channels: ENABLED_CHANNELS.join(' ')
+      })
     }
   }
 

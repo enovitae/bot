@@ -38660,6 +38660,12 @@ async function run(context) {
                 channels: config_1.ENABLED_CHANNELS.join(' ')
             });
         }
+        else {
+            await (0, bot_1.commentToIssue)(context, template, {
+                diff: 'sorry, no new element detected, check last_update in db',
+                channels: config_1.ENABLED_CHANNELS.join(' ')
+            });
+        }
     }
     return template;
 }
