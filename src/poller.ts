@@ -134,6 +134,10 @@ export const scanContent = (db: DbSchema): DbSchema | Error => {
   }
   const files = globSync(`${contentPath}/**/*.mdx`)
 
+  // always reset last_update array
+  const last_update: string[] = []
+  Object.assign(db, { last_update })
+
   files.map(f => {
     if (!f.endsWith('.mdx')) {
       return
@@ -141,17 +145,19 @@ export const scanContent = (db: DbSchema): DbSchema | Error => {
     const post = extractFrontmatter(f)
     const lastModified = getGitDataFromFile(f)
 
-    // always reset last_update array
-    const last_update: string[] = []
-    Object.assign(db, { last_update })
-
     // if new file or last_modified differs
+    console.log('scancontent', f, db)
+    console.log(lastModified)
+
     if (!(f in db) || db[f].last_modified !== lastModified.toJSON()) {
+      console.log('adding', f)
+
       // new or updated content
       db['last_update'].push(f)
     }
     // alway ship entire database
     db[f] = { last_modified: lastModified.toJSON(), ...post }
+    console.log('final', db)
   })
 
   return db

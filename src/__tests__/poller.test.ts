@@ -60,6 +60,40 @@ describe('fail scan content', () => {
     expect(newDb).toEqual(out)
     jest.resetModules()
   })
+  test('should scan directory and get correct post updated', () => {
+    const CODE_PATH = '.'
+    const CONTENT_PATH = `./src/__mocks__/content`
+    jest.mock('../config', () => ({
+      CODE_PATH,
+      CONTENT_PATH,
+      DB_FILE: './src/__mocks__/db_multiple.json'
+    }))
+    const dbJson = readFileSync('./src/__mocks__/db_multiple.json', 'utf-8')
+    const poll = require('../poller')
+    const spy = jest.spyOn(poll, 'getGitDataFromFile')
+    const db = poll.readOrCreateDB()
+
+    // setting wrong date to simulate the update process
+    console.log(db)
+    spy.mockImplementation(f => {
+      if (f === 'src/__mocks__/content/guide/it/content1.mdx') {
+        return new Date('2024-04-01T11:28:17.000Z')
+      }
+      if (f === 'src/__mocks__/content/guide/it/content2.mdx') {
+        return new Date('2014-04-01T11:28:17.000Z')
+      }
+    })
+    db['last_update'] = []
+
+    const newDb = poll.scanContent(db)
+    console.log('newDb', newDb)
+    const out = JSON.parse(dbJson)
+    out['src/__mocks__/content/guide/it/content2.mdx'].last_modified =
+      '2014-04-01T11:28:17.000Z'
+    out['last_update'] = ['src/__mocks__/content/guide/it/content2.mdx']
+    expect(newDb).toEqual(out)
+    jest.resetModules()
+  })
   test('should return filtered last_update element in db', () => {
     const CODE_PATH = './src/__mocks__'
     const CONTENT_PATH = `${CODE_PATH}/src/__mocks__/content`

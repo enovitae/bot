@@ -38930,22 +38930,26 @@ const scanContent = (db) => {
         return new Error();
     }
     const files = (0, glob_1.globSync)(`${contentPath}/**/*.mdx`);
+    // always reset last_update array
+    const last_update = [];
+    Object.assign(db, { last_update });
     files.map(f => {
         if (!f.endsWith('.mdx')) {
             return;
         }
         const post = (0, exports.extractFrontmatter)(f);
         const lastModified = (0, exports.getGitDataFromFile)(f);
-        // always reset last_update array
-        const last_update = [];
-        Object.assign(db, { last_update });
         // if new file or last_modified differs
+        console.log('scancontent', f, db);
+        console.log(lastModified);
         if (!(f in db) || db[f].last_modified !== lastModified.toJSON()) {
+            console.log('adding', f);
             // new or updated content
             db['last_update'].push(f);
         }
         // alway ship entire database
         db[f] = { last_modified: lastModified.toJSON(), ...post };
+        console.log('final', db);
     });
     return db;
 };

@@ -13,5 +13,22 @@
     "isNew": false,
     "tags": ["consigli", "cena", "budget"]
   },
-  "last_update": ["src/__mocks__/content/guide/it/content1.mdx"]
+  "src/__mocks__/content/guide/it/content2.mdx": {
+    "last_modified": "2024-04-10T22:07:49.000Z",
+    "title": "È più buono il Barolo o il Brunello? Le differenze tra Nebbiolo e Sangiovese - test2",
+    "slug": "/it/comparazioni/barolo-vs-brunello",
+    "splash": "../../../assets/images/cantina-botti.jpg",
+    "publish_date": "10 Apr 2024",
+    "author": "Enovitae Staff",
+    "description": "\"Il Nebbiolo e il Sangiovese: Due Vitigni Iconici...\"\n",
+    "alt": "È più buono il Barolo o il Brunello",
+    "splash_credits": "Photo by Ion Ceban @ionelceban: https://www.pexels.com/it-it/foto/lotto-di-botte-nera-in-una-fotografia-di-primo-piano-della-camera-2581022/",
+    "isTrending": true,
+    "isNew": false,
+    "tags": ["vino", "comparazioni"]
+  },
+  "last_update": [
+    "src/__mocks__/content/guide/it/content2.mdx",
+    "src/__mocks__/content/guide/it/content1.mdx"
+  ]
 }
