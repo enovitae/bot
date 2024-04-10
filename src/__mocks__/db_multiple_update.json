@@ -1,0 +1,34 @@
+{
+  "src/__mocks__/content/guide/it/content1.mdx": {
+    "last_modified": "2024-04-01T11:28:17.000Z",
+    "title": "È possibile bere un buon vino sotto i 20 euro? Scopri il gusto dell'accessibilità enologica",
+    "slug": "/it/guide/vino-sotto-20-euro",
+    "splash": "../../../assets/images/vino-20-euro.jpg",
+    "publish_date": "22 Sep 2023",
+    "author": "Enovitae Staff",
+    "description": "\"La domanda che spesso si pongono gli appassionati di vino è: è possibile trovare un buon vino sotto i 20 euro?\"\n",
+    "alt": "È possibile trovare un buon vino sotto i 20 euro?",
+    "splash_credits": "Photo by Grape Things: https://www.pexels.com/it-it/foto/foto-del-primo-piano-delle-bottiglie-di-vino-con-il-sughero-2647933/",
+    "isTrending": true,
+    "isNew": false,
+    "tags": ["consigli", "cena", "budget"]
+  },
+  "src/__mocks__/content/guide/it/content2.mdx": {
+    "last_modified": "2024-04-01T11:28:17.000Z",
+    "title": "È possibile bere un buon vino sotto i 20 euro? Scopri il gusto dell'accessibilità enologica",
+    "slug": "/it/guide/vino-sotto-20-euro",
+    "splash": "../../../assets/images/vino-20-euro.jpg",
+    "publish_date": "22 Sep 2023",
+    "author": "Enovitae Staff",
+    "description": "\"La domanda che spesso si pongono gli appassionati di vino è: è possibile trovare un buon vino sotto i 20 euro?\"\n",
+    "alt": "È possibile trovare un buon vino sotto i 20 euro?",
+    "splash_credits": "Photo by Grape Things: https://www.pexels.com/it-it/foto/foto-del-primo-piano-delle-bottiglie-di-vino-con-il-sughero-2647933/",
+    "isTrending": true,
+    "isNew": false,
+    "tags": ["consigli", "cena", "budget"]
+  },
+  "last_update": [
+    "src/__mocks__/content/guide/it/content1.mdx",
+    "src/__mocks__/content/guide/it/content2.mdx"
+  ]
+}
