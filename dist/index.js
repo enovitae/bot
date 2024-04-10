@@ -38936,14 +38936,15 @@ const scanContent = (db) => {
         }
         const post = (0, exports.extractFrontmatter)(f);
         const lastModified = (0, exports.getGitDataFromFile)(f);
+        // always reset last_update array
+        const last_update = [];
+        Object.assign(db, { last_update });
+        // if new file or last_modified differs
         if (!(f in db) || db[f].last_modified !== lastModified.toJSON()) {
-            if (!('last_update' in db)) {
-                const last_update = [];
-                Object.assign(db, { last_update });
-            }
             // new or updated content
             db['last_update'].push(f);
         }
+        // alway ship entire database
         db[f] = { last_modified: lastModified.toJSON(), ...post };
     });
     return db;

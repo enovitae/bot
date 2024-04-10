@@ -27,7 +27,7 @@ afterAll(() => {
 jest.mock('../config', () => ({
   CODE_PATH: '.',
   CONTENT_PATH: 'src/__mocks__/content',
-  DB_FILE: 'src/__mocks__/db.json'
+  DB_FILE: 'src/__mocks__/db_created_by_test.json'
 }))
 describe('polling command', () => {
   test('should return valid mocked db', async () => {

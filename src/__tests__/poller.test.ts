@@ -44,7 +44,8 @@ describe('fail scan content', () => {
     const CONTENT_PATH = `${CODE_PATH}/src/__mocks__/content`
     jest.mock('../config', () => ({
       CODE_PATH,
-      CONTENT_PATH
+      CONTENT_PATH,
+      DB_FILE: 'db.json'
     }))
     const dbJson = readFileSync('./src/__mocks__/db.json', 'utf-8')
     const { scanContent } = require('../poller')
@@ -54,7 +55,9 @@ describe('fail scan content', () => {
 
     const newDb = scanContent(db)
     console.log('newDb', newDb)
-    expect(newDb).toEqual(JSON.parse(dbJson))
+    const out = JSON.parse(dbJson)
+    out['last_update'] = []
+    expect(newDb).toEqual(out)
     jest.resetModules()
   })
   test('should return filtered last_update element in db', () => {
