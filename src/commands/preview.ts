@@ -45,7 +45,10 @@ export default async function run(context: Context): Promise<string> {
   addLabels(context, ['preview'])
   const db = readDB()
   if (db instanceof Error) {
-    //TODO comment error
+    await commentToIssue(context, template, {
+      diff: 'sorry, no db detected',
+      channels: ENABLED_CHANNELS.join(' ')
+    })
     console.error(db.message)
   } else {
     const filteredDB = getLastUpdatedDBElements(db)
@@ -59,6 +62,7 @@ export default async function run(context: Context): Promise<string> {
         diff: 'sorry, no new element detected, check last_update in db',
         channels: ENABLED_CHANNELS.join(' ')
       })
+      console.error(db)
     }
   }
 

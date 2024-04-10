@@ -38649,7 +38649,10 @@ async function run(context) {
     (0, bot_1.addLabels)(context, ['preview']);
     const db = (0, poller_1.readDB)();
     if (db instanceof Error) {
-        //TODO comment error
+        await (0, bot_1.commentToIssue)(context, template, {
+            diff: 'sorry, no db detected',
+            channels: config_1.ENABLED_CHANNELS.join(' ')
+        });
         console.error(db.message);
     }
     else {
@@ -38665,6 +38668,7 @@ async function run(context) {
                 diff: 'sorry, no new element detected, check last_update in db',
                 channels: config_1.ENABLED_CHANNELS.join(' ')
             });
+            console.error(db);
         }
     }
     return template;
