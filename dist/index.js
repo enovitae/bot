@@ -38809,7 +38809,7 @@ const readDB = () => {
 };
 exports.readDB = readDB;
 const getLastUpdatedDBElements = (db) => {
-    return db.last_update.map(x => ({ [x]: db[x] })).find(t => t);
+    return db.last_update?.map(x => ({ [x]: db[x] })).find(t => t);
 };
 exports.getLastUpdatedDBElements = getLastUpdatedDBElements;
 const readOrCreateDB = () => {

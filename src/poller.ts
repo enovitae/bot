@@ -39,7 +39,7 @@ export const readDB = (): DbSchema | Error => {
 export const getLastUpdatedDBElements = (
   db: DbSchema
 ): Omit<DbSchema, 'last_update'> | undefined => {
-  return db.last_update.map(x => ({ [x]: db[x] })).find(t => t)
+  return db.last_update?.map(x => ({ [x]: db[x] })).find(t => t)
 }
 
 export const readOrCreateDB = (): DbSchema | Error => {

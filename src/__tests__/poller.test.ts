@@ -76,6 +76,8 @@ describe('fail scan content', () => {
     delete dbJsonParsed['last_update']
     expect(filteredDB).toEqual(dbJsonParsed)
 
+    const emptyFilteredDB = getLastUpdatedDBElements(dbJsonParsed)
+    expect(emptyFilteredDB).toEqual(undefined)
     jest.resetModules()
   })
 })
