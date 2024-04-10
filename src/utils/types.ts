@@ -17,6 +17,11 @@ export interface DbEntry extends Post {
   last_modified: string
 }
 
-export type DbSchema = {
+interface last_update {
+  last_update: string[]
+}
+interface db {
   [key: string]: DbEntry
 }
+
+export type DbSchema = last_update & db

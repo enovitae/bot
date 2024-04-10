@@ -6,7 +6,7 @@ import fm from 'front-matter'
 import gitlog from 'gitlog'
 import type { GitlogOptions } from 'gitlog'
 
-const writeOrCreateDB = (db: DbSchema = {}): string => {
+const writeOrCreateDB = (db = {}): string => {
   writeFileSync(`${CODE_PATH}/${DB_FILE}`, JSON.stringify(db), 'utf8')
   return JSON.stringify(db)
 }
@@ -14,6 +14,32 @@ const writeOrCreateDB = (db: DbSchema = {}): string => {
 function isErrnoException(e: unknown): e is NodeJS.ErrnoException {
   if ('code' in (e as Error)) return true
   else return false
+}
+
+export const readDB = (): DbSchema | Error => {
+  try {
+    const src = readFileSync(`${CODE_PATH}/${DB_FILE}`, 'utf8')
+    // TODO check json integrity, otherwise reset it
+
+    console.log('trying to read db file', src)
+    const out: DbSchema = JSON.parse(src)
+    return out
+  } catch (e) {
+    console.error(e)
+    let error = ''
+    if (typeof e === 'string') {
+      error = e
+    } else if (e instanceof Error) {
+      error = e.message
+    }
+    return new Error(error)
+  }
+}
+
+export const getLastUpdatedDBElements = (
+  db: DbSchema
+): Omit<DbSchema, 'last_update'> | undefined => {
+  return db.last_update.map(x => ({ [x]: db[x] })).find(t => t)
 }
 
 export const readOrCreateDB = (): DbSchema | Error => {
@@ -114,6 +140,14 @@ export const scanContent = (db: DbSchema): DbSchema | Error => {
     }
     const post = extractFrontmatter(f)
     const lastModified = getGitDataFromFile(f)
+    if (!(f in db) || db[f].last_modified !== lastModified.toJSON()) {
+      if (!('last_update' in db)) {
+        const last_update: string[] = []
+        Object.assign(db, { last_update })
+      }
+      // new or updated content
+      db['last_update'].push(f)
+    }
     db[f] = { last_modified: lastModified.toJSON(), ...post }
   })
 

@@ -7466,13 +7466,13 @@ module.exports = setup;
 if (typeof process === 'undefined' || process.type === 'renderer' || process.browser === true || process.__nwjs) {
 	module.exports = __nccwpck_require__(8222);
 } else {
-	module.exports = __nccwpck_require__(4874);
+	module.exports = __nccwpck_require__(5106);
 }
 
 
 /***/ }),
 
-/***/ 4874:
+/***/ 5106:
 /***/ ((module, exports, __nccwpck_require__) => {
 
 /**
@@ -9234,7 +9234,7 @@ module.exports.Type = __nccwpck_require__(857);
 module.exports.Schema = __nccwpck_require__(913);
 module.exports.FAILSAFE_SCHEMA = __nccwpck_require__(7609);
 module.exports.JSON_SCHEMA = __nccwpck_require__(3106);
-module.exports.CORE_SCHEMA = __nccwpck_require__(1606);
+module.exports.CORE_SCHEMA = __nccwpck_require__(4874);
 module.exports.DEFAULT_SAFE_SCHEMA = __nccwpck_require__(8739);
 module.exports.DEFAULT_FULL_SCHEMA = __nccwpck_require__(1842);
 module.exports.load                = loader.load;
@@ -12087,7 +12087,7 @@ module.exports = Schema;
 
 /***/ }),
 
-/***/ 1606:
+/***/ 4874:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
@@ -12165,7 +12165,7 @@ var Schema = __nccwpck_require__(913);
 
 module.exports = new Schema({
   include: [
-    __nccwpck_require__(1606)
+    __nccwpck_require__(4874)
   ],
   implicit: [
     __nccwpck_require__(1499),
@@ -38583,29 +38583,9 @@ exports.runCommand = runCommand;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const poller_1 = __nccwpck_require__(1072);
-// function printDbSchemaFields(dbSchema: DbSchema): string {
-//   let str = ''
-//   for (const key in dbSchema) {
-//     if (Object.prototype.hasOwnProperty.call(dbSchema, key)) {
-//       const entry = dbSchema[key] // Type assertion
-//       for (const field in entry) {
-//         if (Object.prototype.hasOwnProperty.call(entry, field)) {
-//           type e = keyof DbEntry
-//           str += `${field}: ${entry[field as e]}\n`
-//         }
-//       }
-//     }
-//   }
-//   return str
-// }
 async function run() {
-    // const template = readFileSync(`${__dirname}/../templates/polling.md`, 'utf8')
     const out = (0, poller_1.polling)();
     if (!(out instanceof Error)) {
-        //FIXME disable comment when invoked from push event, no issue/pr exists though
-        // await commentToIssue(context, template, {
-        //   md: prettyPrint(out)
-        // })
         return 'ok';
     }
     else {
@@ -38627,11 +38607,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.analyzeDiff = void 0;
+exports.prettyPrint = exports.analyzeDiff = void 0;
 const fs_1 = __nccwpck_require__(7147);
 const bot_1 = __nccwpck_require__(8104);
 const gitdiff_parser_1 = __importDefault(__nccwpck_require__(153));
 const config_1 = __nccwpck_require__(6373);
+const poller_1 = __nccwpck_require__(1072);
 const analyzeDiff = (diff) => {
     console.log(diff); // diff
     if (!diff) {
@@ -38644,18 +38625,42 @@ const analyzeDiff = (diff) => {
     return diffText;
 };
 exports.analyzeDiff = analyzeDiff;
+function prettyPrint(dbSchema) {
+    let str = '';
+    for (const k in dbSchema) {
+        const entry = dbSchema[k];
+        str += `<img src="https://enovitae.com/${entry.splash.replace('../../../', '')}" width="250" alt="${entry.alt}">
+`;
+        str += `🍾 ${entry.title}
+`;
+        str += `🥂 ${entry.description}
+`;
+        str += `👉 [https://enovitae.com${entry.slug}](https://enovitae.com${entry.slug})`;
+        str += `
+
+`;
+    }
+    return str;
+}
+exports.prettyPrint = prettyPrint;
 async function run(context) {
     const template = (0, fs_1.readFileSync)(__nccwpck_require__.ab + "preview.md", 'utf8');
     (0, bot_1.reactToComment)(context);
     (0, bot_1.addLabels)(context, ['preview']);
-    const diff = await (0, bot_1.getPullDiff)(context);
-    // TODO remove
-    console.log(diff);
-    const whatChanged = (0, exports.analyzeDiff)(diff);
-    await (0, bot_1.commentToIssue)(context, template, {
-        diff: whatChanged,
-        channels: config_1.ENABLED_CHANNELS.join(' ')
-    });
+    const db = (0, poller_1.readDB)();
+    if (db instanceof Error) {
+        //TODO comment error
+        console.error(db.message);
+    }
+    else {
+        const filteredDB = (0, poller_1.getLastUpdatedDBElements)(db);
+        if (filteredDB) {
+            await (0, bot_1.commentToIssue)(context, template, {
+                diff: prettyPrint(filteredDB),
+                channels: config_1.ENABLED_CHANNELS.join(' ')
+            });
+        }
+    }
     return template;
 }
 exports["default"] = run;
@@ -38760,7 +38765,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.polling = exports.scanContent = exports.getGitDataFromFile = exports.extractFrontmatter = exports.compare = exports.checkFSAccess = exports.readOrCreateDB = void 0;
+exports.polling = exports.scanContent = exports.getGitDataFromFile = exports.extractFrontmatter = exports.compare = exports.checkFSAccess = exports.readOrCreateDB = exports.getLastUpdatedDBElements = exports.readDB = void 0;
 const fs_1 = __nccwpck_require__(7147);
 const config_1 = __nccwpck_require__(6373);
 const glob_1 = __nccwpck_require__(8211);
@@ -38776,6 +38781,31 @@ function isErrnoException(e) {
     else
         return false;
 }
+const readDB = () => {
+    try {
+        const src = (0, fs_1.readFileSync)(`${config_1.CODE_PATH}/${config_1.DB_FILE}`, 'utf8');
+        // TODO check json integrity, otherwise reset it
+        console.log('trying to read db file', src);
+        const out = JSON.parse(src);
+        return out;
+    }
+    catch (e) {
+        console.error(e);
+        let error = '';
+        if (typeof e === 'string') {
+            error = e;
+        }
+        else if (e instanceof Error) {
+            error = e.message;
+        }
+        return new Error(error);
+    }
+};
+exports.readDB = readDB;
+const getLastUpdatedDBElements = (db) => {
+    return db.last_update.map(x => ({ [x]: db[x] })).find(t => t);
+};
+exports.getLastUpdatedDBElements = getLastUpdatedDBElements;
 const readOrCreateDB = () => {
     try {
         let src = (0, fs_1.readFileSync)(`${config_1.CODE_PATH}/${config_1.DB_FILE}`, 'utf8');
@@ -38866,6 +38896,14 @@ const scanContent = (db) => {
         }
         const post = (0, exports.extractFrontmatter)(f);
         const lastModified = (0, exports.getGitDataFromFile)(f);
+        if (!(f in db) || db[f].last_modified !== lastModified.toJSON()) {
+            if (!('last_update' in db)) {
+                const last_update = [];
+                Object.assign(db, { last_update });
+            }
+            // new or updated content
+            db['last_update'].push(f);
+        }
         db[f] = { last_modified: lastModified.toJSON(), ...post };
     });
     return db;
