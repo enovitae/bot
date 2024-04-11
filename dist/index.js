@@ -38518,7 +38518,14 @@ const config_1 = __nccwpck_require__(6373);
 // '
 async function telegram({ message }) {
     try {
-        const data = await axios_1.default.post(config_1.TELEGRAM_API_URL, { chat_id: config_1.TELEGRAM_CHAT_ID, text: message }, {
+        const data = await axios_1.default.post(config_1.TELEGRAM_API_URL, {
+            chat_id: config_1.TELEGRAM_CHAT_ID,
+            text: message,
+            parse_mode: 'MarkdownV2',
+            disable_web_page_preview: false,
+            reply_to_message_id: null,
+            disable_notification: false
+        }, {
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json'

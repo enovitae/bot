@@ -23,7 +23,14 @@ export async function telegram({
   try {
     const data = await axios.post<ApiResponse>(
       TELEGRAM_API_URL,
-      { chat_id: TELEGRAM_CHAT_ID, text: message },
+      {
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message,
+        parse_mode: 'MarkdownV2',
+        disable_web_page_preview: false,
+        reply_to_message_id: null,
+        disable_notification: false
+      },
       {
         headers: {
           Accept: 'application/json',
