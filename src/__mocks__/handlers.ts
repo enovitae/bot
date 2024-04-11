@@ -182,12 +182,16 @@ export const handlers = [
       status: 'success'
     })
   }),
-  http.post('https://api.telegram.org', () => {
+  http.post('https://api.telegram.org/botXXXXX', () => {
     return HttpResponse.json({
-      attempt: '018e4eaa-4364-3c25-a3f5-49d29a5b5595',
-      id: '018e4eaa-4364-3c25-a3f5-49d29a5b5595',
-      request_id: '018e4eaa-4364-3c25-a3f5-49d29a5b5595',
-      status: 'success'
+      ok: true,
+      result: {
+        message_id: 12,
+        sender_chat: { id: -99999999999, title: '99999999999', type: 'channel' },
+        chat: { id: -99999999999, title: '99999999999', type: 'channel' },
+        date: 1712831817,
+        text: 'ciao'
+      }
     })
   })
 ]

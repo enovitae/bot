@@ -38531,6 +38531,7 @@ async function telegram({ message }) {
     }
     catch (error) {
         if ((0, axios_1.isAxiosError)(error)) {
+            console.error(error);
             return {
                 message: error.message,
                 status: error?.response?.status || 999
@@ -38821,7 +38822,6 @@ async function run(context, args) {
                     // FIXME understand how determine if publishing is a fail (for all records)
                     publishStatus = await (0, exports.runPublish)(args, (0, preview_1.prettyPrint)({ [k]: entry }), context, template);
                 }
-                console.log('p', filteredDB, args, config_1.ENABLED_CHANNELS, publishStatus);
                 if (publishStatus) {
                     await (0, bot_1.commentToIssue)(context, template, {
                         text: (0, preview_1.prettyPrint)(filteredDB),

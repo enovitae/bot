@@ -38,6 +38,8 @@ export async function telegram({
     return data
   } catch (error) {
     if (isAxiosError(error)) {
+      console.error(error)
+
       return {
         message: error.message,
         status: error?.response?.status || 999

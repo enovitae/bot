@@ -75,7 +75,6 @@ export default async function run(
             template
           )
         }
-        console.log('p', filteredDB, args, ENABLED_CHANNELS, publishStatus)
         if (publishStatus) {
           await commentToIssue(context, template, {
             text: prettyPrint(filteredDB),
