@@ -38531,7 +38531,6 @@ async function telegram({ message }) {
     }
     catch (error) {
         if ((0, axios_1.isAxiosError)(error)) {
-            console.error(error);
             return {
                 message: error.message,
                 status: error?.response?.status || 999
