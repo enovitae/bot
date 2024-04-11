@@ -10,5 +10,7 @@ export const CHANNELS = ['whatsapp', 'telegram', 'pinterest', 'zapier'] as const
 export const ENABLED_CHANNELS = ['zapier', 'telegram'] as const
 export const ZAPIER_API_URL =
   process.env.ZAPIER_API_URL || 'https://api.zapier.org'
+// eg: https://api.telegram.org/botXXXXXXXXX:YYYYYYYYYYYYYYYYYYYYYYYYYYY/sendMessage
 export const TELEGRAM_API_URL =
-  process.env.TELEGRAM_API_URL || 'https://api.telegram.org'
+  process.env.TELEGRAM_API_URL || 'https://api.telegram.org/botXXXXX'
+export const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || '-999999999999'

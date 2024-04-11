@@ -38504,7 +38504,7 @@ exports.telegram = void 0;
 const axios_1 = __importStar(__nccwpck_require__(8757));
 const config_1 = __nccwpck_require__(6373);
 // curl --request POST \
-//      --url https://api.telegram.org/bottoken/sendMessage \
+//      --url https://api.telegram.org/bot{token}/sendMessage \
 //      --header 'accept: application/json' \
 //      --header 'content-type: application/json' \
 //      --data '
@@ -38518,7 +38518,7 @@ const config_1 = __nccwpck_require__(6373);
 // '
 async function telegram({ message }) {
     try {
-        const data = await axios_1.default.post(config_1.TELEGRAM_API_URL, { message }, {
+        const data = await axios_1.default.post(config_1.TELEGRAM_API_URL, { chat_id: config_1.TELEGRAM_CHAT_ID, text: message }, {
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json'
@@ -38867,7 +38867,7 @@ exports["default"] = run;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TELEGRAM_API_URL = exports.ZAPIER_API_URL = exports.ENABLED_CHANNELS = exports.CHANNELS = exports.MAINTAINERS_TEAM = exports.DB_FILE = exports.CONTENT_PATH = exports.CODE_PATH = exports.BOT_USERNAME = void 0;
+exports.TELEGRAM_CHAT_ID = exports.TELEGRAM_API_URL = exports.ZAPIER_API_URL = exports.ENABLED_CHANNELS = exports.CHANNELS = exports.MAINTAINERS_TEAM = exports.DB_FILE = exports.CONTENT_PATH = exports.CODE_PATH = exports.BOT_USERNAME = void 0;
 const core_1 = __nccwpck_require__(2186);
 exports.BOT_USERNAME = process.env.BOT_USERNAME || (0, core_1.getInput)('username');
 exports.CODE_PATH = '/home/runner/work/test-bot/test-bot/code' || 0;
@@ -38877,7 +38877,9 @@ exports.MAINTAINERS_TEAM = 'enovitae/maintainers';
 exports.CHANNELS = ['whatsapp', 'telegram', 'pinterest', 'zapier'];
 exports.ENABLED_CHANNELS = ['zapier', 'telegram'];
 exports.ZAPIER_API_URL = process.env.ZAPIER_API_URL || 'https://api.zapier.org';
-exports.TELEGRAM_API_URL = process.env.TELEGRAM_API_URL || 'https://api.telegram.org';
+// eg: https://api.telegram.org/botXXXXXXXXX:YYYYYYYYYYYYYYYYYYYYYYYYYYY/sendMessage
+exports.TELEGRAM_API_URL = process.env.TELEGRAM_API_URL || 'https://api.telegram.org/botXXXXX';
+exports.TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || '-999999999999';
 
 
 /***/ }),

@@ -1,10 +1,10 @@
 import axios, { isAxiosError } from 'axios'
 import type { AxiosResponse } from 'axios'
-import { TELEGRAM_API_URL } from '../config'
+import { TELEGRAM_API_URL, TELEGRAM_CHAT_ID } from '../config'
 import { ApiError, ApiResponse, Message } from '.'
 
 // curl --request POST \
-//      --url https://api.telegram.org/bottoken/sendMessage \
+//      --url https://api.telegram.org/bot{token}/sendMessage \
 //      --header 'accept: application/json' \
 //      --header 'content-type: application/json' \
 //      --data '
@@ -23,7 +23,7 @@ export async function telegram({
   try {
     const data = await axios.post<ApiResponse>(
       TELEGRAM_API_URL,
-      { message },
+      { chat_id: TELEGRAM_CHAT_ID, text: message },
       {
         headers: {
           Accept: 'application/json',
