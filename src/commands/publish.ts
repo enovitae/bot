@@ -34,7 +34,10 @@ export const runPublish = async (
     return true
   } else {
     // FIXME, triggered when @enovitae-bot publish (no args)
-    console.log('something wrong publishing, maybe no channel specified', args)
+    console.log(
+      'something wrong publishing, maybe no or wrong channel specified',
+      args
+    )
     return false
   }
 }
@@ -72,13 +75,20 @@ export default async function run(
             template
           )
         }
-        console.log('p', filteredDB, args, ENABLED_CHANNELS)
-
-        await commentToIssue(context, template, {
-          text: prettyPrint(filteredDB),
-          channels: ENABLED_CHANNELS.join(' ')
-        })
-        return publishStatus
+        console.log('p', filteredDB, args, ENABLED_CHANNELS, publishStatus)
+        if (publishStatus) {
+          await commentToIssue(context, template, {
+            text: prettyPrint(filteredDB),
+            channels: ENABLED_CHANNELS.join(' ')
+          })
+          return true
+        } else {
+          await commentToIssue(context, template, {
+            text: 'sorry, something wrong publishing, check logs',
+            channels: ENABLED_CHANNELS.join(' ')
+          })
+          return false
+        }
       } else {
         await commentToIssue(context, template, {
           text: 'sorry, argument specified for command is not valid',

@@ -38792,7 +38792,7 @@ const runPublish = async (args, whatChanged, context, template) => {
     }
     else {
         // FIXME, triggered when @enovitae-bot publish (no args)
-        console.log('something wrong publishing, maybe no channel specified', args);
+        console.log('something wrong publishing, maybe no or wrong channel specified', args);
         return false;
     }
 };
@@ -38821,12 +38821,21 @@ async function run(context, args) {
                     // FIXME understand how determine if publishing is a fail (for all records)
                     publishStatus = await (0, exports.runPublish)(args, (0, preview_1.prettyPrint)({ [k]: entry }), context, template);
                 }
-                console.log('p', filteredDB, args, config_1.ENABLED_CHANNELS);
-                await (0, bot_1.commentToIssue)(context, template, {
-                    text: (0, preview_1.prettyPrint)(filteredDB),
-                    channels: config_1.ENABLED_CHANNELS.join(' ')
-                });
-                return publishStatus;
+                console.log('p', filteredDB, args, config_1.ENABLED_CHANNELS, publishStatus);
+                if (publishStatus) {
+                    await (0, bot_1.commentToIssue)(context, template, {
+                        text: (0, preview_1.prettyPrint)(filteredDB),
+                        channels: config_1.ENABLED_CHANNELS.join(' ')
+                    });
+                    return true;
+                }
+                else {
+                    await (0, bot_1.commentToIssue)(context, template, {
+                        text: 'sorry, something wrong publishing, check logs',
+                        channels: config_1.ENABLED_CHANNELS.join(' ')
+                    });
+                    return false;
+                }
             }
             else {
                 await (0, bot_1.commentToIssue)(context, template, {
