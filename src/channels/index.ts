@@ -1,9 +1,10 @@
+import { telegram } from './telegram'
 import { zapier } from './zapier'
 import type { AxiosResponse } from 'axios'
 
 export type Message = {
   message: string
-  channel: string
+  channel?: string
   // channel: (typeof CHANNELS)[number]
 }
 export interface ApiResponse {
@@ -30,6 +31,7 @@ const send = async ({
       return zapier({ channel, message })
     case 'pinterest':
     case 'telegram':
+      return telegram({ message })
     case 'whatsapp':
       return Promise.resolve({
         message: 'channel not yet implemented',

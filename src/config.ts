@@ -7,6 +7,8 @@ export const CONTENT_PATH = `src/content` || getInput('content_path')
 export const DB_FILE = 'public/db.json' || getInput('db_file')
 export const MAINTAINERS_TEAM = 'enovitae/maintainers'
 export const CHANNELS = ['whatsapp', 'telegram', 'pinterest', 'zapier'] as const
-export const ENABLED_CHANNELS = ['zapier'] as const
+export const ENABLED_CHANNELS = ['zapier', 'telegram'] as const
 export const ZAPIER_API_URL =
   process.env.ZAPIER_API_URL || 'https://api.example.org'
+export const TELEGRAM_API_URL =
+  process.env.TELEGRAM_API_URL || 'https://api.example.org'

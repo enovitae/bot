@@ -38449,6 +38449,7 @@ exports.getPullDiff = getPullDiff;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.send = void 0;
+const telegram_1 = __nccwpck_require__(3683);
 const zapier_1 = __nccwpck_require__(2532);
 const send = async ({ channel, message }) => {
     switch (channel) {
@@ -38456,6 +38457,7 @@ const send = async ({ channel, message }) => {
             return (0, zapier_1.zapier)({ channel, message });
         case 'pinterest':
         case 'telegram':
+            return (0, telegram_1.telegram)({ message });
         case 'whatsapp':
             return Promise.resolve({
                 message: 'channel not yet implemented',
@@ -38465,6 +38467,86 @@ const send = async ({ channel, message }) => {
     return Promise.resolve({ message: 'unknown channel specified', status: 999 });
 };
 exports.send = send;
+
+
+/***/ }),
+
+/***/ 3683:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.telegram = void 0;
+const axios_1 = __importStar(__nccwpck_require__(8757));
+const config_1 = __nccwpck_require__(6373);
+// curl --request POST \
+//      --url https://api.telegram.org/bottoken/sendMessage \
+//      --header 'User-Agent: Telegram Bot SDK - (https://github.com/irazasyed/telegram-bot-sdk)' \
+//      --header 'accept: application/json' \
+//      --header 'content-type: application/json' \
+//      --data '
+// {
+//   "text": "Required",
+//   "parse_mode": "Optional",
+//   "disable_web_page_preview": false,
+//   "disable_notification": false,
+//   "reply_to_message_id": null
+// }
+// '
+async function telegram({ message }) {
+    try {
+        const data = await axios_1.default.post(config_1.TELEGRAM_API_URL, { message }, {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        // ex
+        // {"attempt":"018e4eaa-4364-3c25-a3f5-49d29a5b5595","id":"018e4eaa-4364-3c25-a3f5-49d29a5b5595",
+        // "request_id":"018e4eaa-4364-3c25-a3f5-49d29a5b5595","status":"success"}
+        return data;
+    }
+    catch (error) {
+        if ((0, axios_1.isAxiosError)(error)) {
+            return {
+                message: error.message,
+                status: error?.response?.status || 999
+            };
+        }
+        else {
+            console.log('unexpected error: ', error);
+            return {
+                message: 'An unexpected error occurred',
+                status: 999
+            };
+        }
+    }
+}
+exports.telegram = telegram;
 
 
 /***/ }),
@@ -38768,7 +38850,7 @@ exports["default"] = run;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ZAPIER_API_URL = exports.ENABLED_CHANNELS = exports.CHANNELS = exports.MAINTAINERS_TEAM = exports.DB_FILE = exports.CONTENT_PATH = exports.CODE_PATH = exports.BOT_USERNAME = void 0;
+exports.TELEGRAM_API_URL = exports.ZAPIER_API_URL = exports.ENABLED_CHANNELS = exports.CHANNELS = exports.MAINTAINERS_TEAM = exports.DB_FILE = exports.CONTENT_PATH = exports.CODE_PATH = exports.BOT_USERNAME = void 0;
 const core_1 = __nccwpck_require__(2186);
 exports.BOT_USERNAME = process.env.BOT_USERNAME || (0, core_1.getInput)('username');
 exports.CODE_PATH = '/home/runner/work/test-bot/test-bot/code' || 0;
@@ -38776,8 +38858,9 @@ exports.CONTENT_PATH = `src/content` || 0;
 exports.DB_FILE = 'public/db.json' || 0;
 exports.MAINTAINERS_TEAM = 'enovitae/maintainers';
 exports.CHANNELS = ['whatsapp', 'telegram', 'pinterest', 'zapier'];
-exports.ENABLED_CHANNELS = ['zapier'];
+exports.ENABLED_CHANNELS = ['zapier', 'telegram'];
 exports.ZAPIER_API_URL = process.env.ZAPIER_API_URL || 'https://api.example.org';
+exports.TELEGRAM_API_URL = process.env.TELEGRAM_API_URL || 'https://api.example.org';
 
 
 /***/ }),
