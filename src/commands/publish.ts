@@ -3,7 +3,7 @@ import { Context } from '@actions/github/lib/context'
 
 import { reactToComment, commentToIssue, addLabels } from '../bot'
 import { send } from '../channels'
-import { CHANNELS, ENABLED_CHANNELS } from '../config'
+import { ENABLED_CHANNELS } from '../config'
 import { prettyPrint } from './preview'
 import { getLastUpdatedDBElements, readDB } from '../poller'
 
@@ -13,7 +13,9 @@ export const runPublish = async (
   context: Context,
   template: string
 ): Promise<boolean> => {
-  if (args && args?.length > 0 && CHANNELS.some(c => c === args[0])) {
+  if (args && args?.length > 0 && ENABLED_CHANNELS.some(c => c === args[0])) {
+    console.log('channel', args[0])
+
     const res = await send({ channel: args[0], message: whatChanged })
     if (!('data' in res)) {
       console.error(res.message, res.status)
@@ -32,7 +34,7 @@ export const runPublish = async (
     return true
   } else {
     // FIXME, triggered when @enovitae-bot publish (no args)
-    console.log('something wrong publishing', args)
+    console.log('something wrong publishing, maybe no channel specified', args)
     return false
   }
 }
@@ -40,7 +42,7 @@ export const runPublish = async (
 export default async function run(
   context: Context,
   args?: string[]
-): Promise<string> {
+): Promise<boolean> {
   const template = readFileSync(`${__dirname}/../templates/publish.md`, 'utf8')
 
   reactToComment(context)
@@ -52,26 +54,38 @@ export default async function run(
       channels: ENABLED_CHANNELS.join(' ')
     })
     console.error(db.message)
+    return false
   } else {
     const filteredDB = getLastUpdatedDBElements(db)
     if (filteredDB) {
       // I expect channel as first parameter
       // TODO ugly
+      let publishStatus = false
       if (args) {
         for (const k in filteredDB) {
           const entry = filteredDB[k]
-          runPublish(args, prettyPrint({ [k]: entry }), context, template)
+          // FIXME understand how determine if publishing is a fail (for all records)
+          publishStatus = await runPublish(
+            args,
+            prettyPrint({ [k]: entry }),
+            context,
+            template
+          )
         }
+        console.log('p', filteredDB, args, ENABLED_CHANNELS)
+
         await commentToIssue(context, template, {
           text: prettyPrint(filteredDB),
           channels: ENABLED_CHANNELS.join(' ')
         })
+        return publishStatus
       } else {
         await commentToIssue(context, template, {
           text: 'sorry, argument specified for command is not valid',
           channels: ENABLED_CHANNELS.join(' ')
         })
         console.error('args not valid', args)
+        return false
       }
     } else {
       await commentToIssue(context, template, {
@@ -79,7 +93,7 @@ export default async function run(
         channels: ENABLED_CHANNELS.join(' ')
       })
       console.error(db)
+      return false
     }
   }
-  return template
 }

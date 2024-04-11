@@ -1,11 +1,11 @@
 import { polling } from '../poller'
 
-export default async function run(): Promise<string> {
+export default async function run(): Promise<boolean> {
   const out = polling()
   if (!(out instanceof Error)) {
-    return 'ok'
+    return true
   } else {
     console.error('error elaborating content', out)
-    return 'ko'
+    return false
   }
 }

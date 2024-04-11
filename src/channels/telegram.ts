@@ -5,7 +5,6 @@ import { ApiError, ApiResponse, Message } from '.'
 
 // curl --request POST \
 //      --url https://api.telegram.org/bottoken/sendMessage \
-//      --header 'User-Agent: Telegram Bot SDK - (https://github.com/irazasyed/telegram-bot-sdk)' \
 //      --header 'accept: application/json' \
 //      --header 'content-type: application/json' \
 //      --data '

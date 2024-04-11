@@ -75,6 +75,8 @@ it('test publish commands', async () => {
   expect(
     await runPublish(['pinterest'], diffJSON.data, context, '')
   ).toBeFalsy()
-  expect(await runPublish(['telegram'], diffJSON.data, context, '')).toBeFalsy()
+  expect(
+    await runPublish(['telegram'], diffJSON.data, context, '')
+  ).toBeTruthy()
   expect(await runPublish(['zapier'], diffJSON.data, context, '')).toBeTruthy()
 })

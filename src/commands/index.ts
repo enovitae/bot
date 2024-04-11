@@ -7,7 +7,7 @@ import { Command } from '../bot'
 
 interface CommandMap {
   name: string
-  fn: (context: Context, args?: string[]) => Promise<string>
+  fn: (context: Context, args?: string[]) => Promise<boolean>
 }
 
 export const commandList: CommandMap[] = [
@@ -30,7 +30,7 @@ export const commandList: CommandMap[] = [
 export async function runCommand(
   context: Context,
   command: Command
-): Promise<undefined | string> {
+): Promise<undefined | boolean> {
   console.log(
     `Running '${command.command}' with args '${command.args}' command for comment ${context.payload.comment?.html_url} ...`
   )

@@ -168,7 +168,21 @@ export const handlers = [
       return HttpResponse.json({})
     }
   ),
-  http.post('https://api.example.org', () => {
+  http.post(
+    'https://api.github.com/repos/enovitae/https%3A%2F%2Fgithub.com%2Fenovitae%2Ftest-bot/issues/comments/1987394055/reactions',
+    () => {
+      return HttpResponse.json({})
+    }
+  ),
+  http.post('https://api.zapier.org', () => {
+    return HttpResponse.json({
+      attempt: '018e4eaa-4364-3c25-a3f5-49d29a5b5595',
+      id: '018e4eaa-4364-3c25-a3f5-49d29a5b5595',
+      request_id: '018e4eaa-4364-3c25-a3f5-49d29a5b5595',
+      status: 'success'
+    })
+  }),
+  http.post('https://api.telegram.org', () => {
     return HttpResponse.json({
       attempt: '018e4eaa-4364-3c25-a3f5-49d29a5b5595',
       id: '018e4eaa-4364-3c25-a3f5-49d29a5b5595',

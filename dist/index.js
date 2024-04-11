@@ -38505,7 +38505,6 @@ const axios_1 = __importStar(__nccwpck_require__(8757));
 const config_1 = __nccwpck_require__(6373);
 // curl --request POST \
 //      --url https://api.telegram.org/bottoken/sendMessage \
-//      --header 'User-Agent: Telegram Bot SDK - (https://github.com/irazasyed/telegram-bot-sdk)' \
 //      --header 'accept: application/json' \
 //      --header 'content-type: application/json' \
 //      --data '
@@ -38668,11 +38667,11 @@ const poller_1 = __nccwpck_require__(1072);
 async function run() {
     const out = (0, poller_1.polling)();
     if (!(out instanceof Error)) {
-        return 'ok';
+        return true;
     }
     else {
         console.error('error elaborating content', out);
-        return 'ko';
+        return false;
     }
 }
 exports["default"] = run;
@@ -38736,6 +38735,7 @@ async function run(context) {
             channels: config_1.ENABLED_CHANNELS.join(' ')
         });
         console.error(db.message);
+        return false;
     }
     else {
         const filteredDB = (0, poller_1.getLastUpdatedDBElements)(db);
@@ -38744,6 +38744,7 @@ async function run(context) {
                 diff: prettyPrint(filteredDB),
                 channels: config_1.ENABLED_CHANNELS.join(' ')
             });
+            return true;
         }
         else {
             await (0, bot_1.commentToIssue)(context, template, {
@@ -38751,9 +38752,9 @@ async function run(context) {
                 channels: config_1.ENABLED_CHANNELS.join(' ')
             });
             console.error(db);
+            return false;
         }
     }
-    return template;
 }
 exports["default"] = run;
 
@@ -38774,7 +38775,8 @@ const config_1 = __nccwpck_require__(6373);
 const preview_1 = __nccwpck_require__(3727);
 const poller_1 = __nccwpck_require__(1072);
 const runPublish = async (args, whatChanged, context, template) => {
-    if (args && args?.length > 0 && config_1.CHANNELS.some(c => c === args[0])) {
+    if (args && args?.length > 0 && config_1.ENABLED_CHANNELS.some(c => c === args[0])) {
+        console.log('channel', args[0]);
         const res = await (0, channels_1.send)({ channel: args[0], message: whatChanged });
         if (!('data' in res)) {
             console.error(res.message, res.status);
@@ -38790,7 +38792,7 @@ const runPublish = async (args, whatChanged, context, template) => {
     }
     else {
         // FIXME, triggered when @enovitae-bot publish (no args)
-        console.log('something wrong publishing', args);
+        console.log('something wrong publishing, maybe no channel specified', args);
         return false;
     }
 };
@@ -38805,21 +38807,26 @@ async function run(context, args) {
             channels: config_1.ENABLED_CHANNELS.join(' ')
         });
         console.error(db.message);
+        return false;
     }
     else {
         const filteredDB = (0, poller_1.getLastUpdatedDBElements)(db);
         if (filteredDB) {
             // I expect channel as first parameter
             // TODO ugly
+            let publishStatus = false;
             if (args) {
                 for (const k in filteredDB) {
                     const entry = filteredDB[k];
-                    (0, exports.runPublish)(args, (0, preview_1.prettyPrint)({ [k]: entry }), context, template);
+                    // FIXME understand how determine if publishing is a fail (for all records)
+                    publishStatus = await (0, exports.runPublish)(args, (0, preview_1.prettyPrint)({ [k]: entry }), context, template);
                 }
+                console.log('p', filteredDB, args, config_1.ENABLED_CHANNELS);
                 await (0, bot_1.commentToIssue)(context, template, {
                     text: (0, preview_1.prettyPrint)(filteredDB),
                     channels: config_1.ENABLED_CHANNELS.join(' ')
                 });
+                return publishStatus;
             }
             else {
                 await (0, bot_1.commentToIssue)(context, template, {
@@ -38827,6 +38834,7 @@ async function run(context, args) {
                     channels: config_1.ENABLED_CHANNELS.join(' ')
                 });
                 console.error('args not valid', args);
+                return false;
             }
         }
         else {
@@ -38835,9 +38843,9 @@ async function run(context, args) {
                 channels: config_1.ENABLED_CHANNELS.join(' ')
             });
             console.error(db);
+            return false;
         }
     }
-    return template;
 }
 exports["default"] = run;
 
@@ -38859,8 +38867,8 @@ exports.DB_FILE = 'public/db.json' || 0;
 exports.MAINTAINERS_TEAM = 'enovitae/maintainers';
 exports.CHANNELS = ['whatsapp', 'telegram', 'pinterest', 'zapier'];
 exports.ENABLED_CHANNELS = ['zapier', 'telegram'];
-exports.ZAPIER_API_URL = process.env.ZAPIER_API_URL || 'https://api.example.org';
-exports.TELEGRAM_API_URL = process.env.TELEGRAM_API_URL || 'https://api.example.org';
+exports.ZAPIER_API_URL = process.env.ZAPIER_API_URL || 'https://api.zapier.org';
+exports.TELEGRAM_API_URL = process.env.TELEGRAM_API_URL || 'https://api.telegram.org';
 
 
 /***/ }),

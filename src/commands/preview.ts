@@ -38,7 +38,7 @@ export function prettyPrint(dbSchema: Omit<DbSchema, 'last_update'>): string {
   return str
 }
 
-export default async function run(context: Context): Promise<string> {
+export default async function run(context: Context): Promise<boolean> {
   const template = readFileSync(`${__dirname}/../templates/preview.md`, 'utf8')
 
   reactToComment(context)
@@ -50,6 +50,7 @@ export default async function run(context: Context): Promise<string> {
       channels: ENABLED_CHANNELS.join(' ')
     })
     console.error(db.message)
+    return false
   } else {
     const filteredDB = getLastUpdatedDBElements(db)
     if (filteredDB) {
@@ -57,14 +58,14 @@ export default async function run(context: Context): Promise<string> {
         diff: prettyPrint(filteredDB),
         channels: ENABLED_CHANNELS.join(' ')
       })
+      return true
     } else {
       await commentToIssue(context, template, {
         diff: 'sorry, no new element detected, check last_update in db',
         channels: ENABLED_CHANNELS.join(' ')
       })
       console.error(db)
+      return false
     }
   }
-
-  return template
 }
