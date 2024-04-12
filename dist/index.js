@@ -38520,7 +38520,7 @@ async function telegram({ message }) {
     try {
         const data = await axios_1.default.post(config_1.TELEGRAM_API_URL, {
             chat_id: config_1.TELEGRAM_CHAT_ID,
-            text: message,
+            text: Buffer.from(message, 'utf-8').toString(),
             parse_mode: 'MarkdownV2',
             disable_web_page_preview: false,
             reply_to_message_id: null,
@@ -38713,17 +38713,24 @@ const analyzeDiff = (diff) => {
     return diffText;
 };
 exports.analyzeDiff = analyzeDiff;
-function prettyPrint(dbSchema) {
+const sanitizeForMarkdownV2 = (str) => str.replaceAll('.', '').replaceAll('-', '');
+function prettyPrint(dbSchema, github) {
     let str = '';
     for (const k in dbSchema) {
         const entry = dbSchema[k];
-        str += `<img src="https://enovitae.com/${entry.splash.replace('../../../', '')}" width="250" alt="${entry.alt}">
+        const image = entry.splash
+            .replace('../../../assets/images/', 'assets/images/thumbnails/')
+            .replace('.jpg', '.webp');
+        if (github) {
+            str += `![${entry.alt}](https://enovitae.com/${image})
 `;
-        str += `🍾 ${entry.title}
+        }
+        str += `\u{1F37E} ${sanitizeForMarkdownV2(entry.title)}
+
 `;
-        str += `🥂 ${entry.description}
+        str += `\u{1F942} ${sanitizeForMarkdownV2(entry.description)}
 `;
-        str += `👉 [https://enovitae.com${entry.slug}](https://enovitae.com${entry.slug})`;
+        str += `\u{1F449} [link](https://enovitae.com${entry.slug})`;
         str += `
 
 `;
@@ -38748,7 +38755,7 @@ async function run(context) {
         const filteredDB = (0, poller_1.getLastUpdatedDBElements)(db);
         if (filteredDB) {
             await (0, bot_1.commentToIssue)(context, template, {
-                diff: prettyPrint(filteredDB),
+                diff: prettyPrint(filteredDB, true),
                 channels: config_1.ENABLED_CHANNELS.join(' ')
             });
             return true;
@@ -38781,20 +38788,17 @@ const channels_1 = __nccwpck_require__(6377);
 const config_1 = __nccwpck_require__(6373);
 const preview_1 = __nccwpck_require__(3727);
 const poller_1 = __nccwpck_require__(1072);
-const runPublish = async (args, whatChanged, context, template) => {
+const runPublish = async (args, whatChanged, context) => {
     if (args && args?.length > 0 && config_1.ENABLED_CHANNELS.some(c => c === args[0])) {
         console.log('channel', args[0]);
         const res = await (0, channels_1.send)({ channel: args[0], message: whatChanged });
         if (!('data' in res)) {
             console.error(res.message, res.status);
             const errorTpl = (0, fs_1.readFileSync)(__nccwpck_require__.ab + "errors.md", 'utf8');
+            // TODO remove, we could potentially be flooded from this one
             await (0, bot_1.commentToIssue)(context, errorTpl, { errors: res.message });
             return false;
         }
-        await (0, bot_1.commentToIssue)(context, template, {
-            channels: config_1.ENABLED_CHANNELS.join(' ')
-        });
-        await (0, bot_1.addLabels)(context, ['published']);
         return true;
     }
     else {
@@ -38826,13 +38830,14 @@ async function run(context, args) {
                 for (const k in filteredDB) {
                     const entry = filteredDB[k];
                     // FIXME understand how determine if publishing is a fail (for all records)
-                    publishStatus = await (0, exports.runPublish)(args, (0, preview_1.prettyPrint)({ [k]: entry }), context, template);
+                    publishStatus = await (0, exports.runPublish)(args, (0, preview_1.prettyPrint)({ [k]: entry }, false), context);
                 }
                 if (publishStatus) {
                     await (0, bot_1.commentToIssue)(context, template, {
-                        text: (0, preview_1.prettyPrint)(filteredDB),
+                        text: '\u{1F64C} Success!: check your previously specified channel',
                         channels: config_1.ENABLED_CHANNELS.join(' ')
                     });
+                    await (0, bot_1.addLabels)(context, ['published']);
                     return true;
                 }
                 else {

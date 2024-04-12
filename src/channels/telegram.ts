@@ -25,7 +25,7 @@ export async function telegram({
       TELEGRAM_API_URL,
       {
         chat_id: TELEGRAM_CHAT_ID,
-        text: message,
+        text: Buffer.from(message, 'utf-8').toString(),
         parse_mode: 'MarkdownV2',
         disable_web_page_preview: false,
         reply_to_message_id: null,

@@ -28,7 +28,7 @@ afterAll(() => {
 
 jest.mock('../config', () => ({
   ENABLED_CHANNELS: ['zapier', 'telegram'],
-  TELEGRAM_CHAT_ID: '-99999999999',
+  TELEGRAM_CHAT_ID: '-999999999999',
   CODE_PATH: '.',
   CONTENT_PATH: 'src/__mocks__/content',
   DB_FILE: 'src/__mocks__/db_multiple.json',

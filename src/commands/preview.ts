@@ -19,18 +19,30 @@ export const analyzeDiff = (diff: string): string => {
   return diffText
 }
 
-export function prettyPrint(dbSchema: Omit<DbSchema, 'last_update'>): string {
+const sanitizeForMarkdownV2 = (str: string): string =>
+  str.replaceAll('.', '').replaceAll('-', '')
+
+export function prettyPrint(
+  dbSchema: Omit<DbSchema, 'last_update'>,
+  github: boolean
+): string {
   let str = ''
   for (const k in dbSchema) {
     const entry = dbSchema[k]
+    const image = entry.splash
+      .replace('../../../assets/images/', 'assets/images/thumbnails/')
+      .replace('.jpg', '.webp')
 
-    str += `<img src="https://enovitae.com/${entry.splash.replace('../../../', '')}" width="250" alt="${entry.alt}">
+    if (github) {
+      str += `![${entry.alt}](https://enovitae.com/${image})
 `
-    str += `🍾 ${entry.title}
+    }
+    str += `\u{1F37E} ${sanitizeForMarkdownV2(entry.title)}
+
 `
-    str += `🥂 ${entry.description}
+    str += `\u{1F942} ${sanitizeForMarkdownV2(entry.description)}
 `
-    str += `👉 [https://enovitae.com${entry.slug}](https://enovitae.com${entry.slug})`
+    str += `\u{1F449} [link](https://enovitae.com${entry.slug})`
     str += `
 
 `
@@ -55,7 +67,7 @@ export default async function run(context: Context): Promise<boolean> {
     const filteredDB = getLastUpdatedDBElements(db)
     if (filteredDB) {
       await commentToIssue(context, template, {
-        diff: prettyPrint(filteredDB),
+        diff: prettyPrint(filteredDB, true),
         channels: ENABLED_CHANNELS.join(' ')
       })
       return true

@@ -10,8 +10,7 @@ import { getLastUpdatedDBElements, readDB } from '../poller'
 export const runPublish = async (
   args: string[],
   whatChanged: string,
-  context: Context,
-  template: string
+  context: Context
 ): Promise<boolean> => {
   if (args && args?.length > 0 && ENABLED_CHANNELS.some(c => c === args[0])) {
     console.log('channel', args[0])
@@ -23,14 +22,11 @@ export const runPublish = async (
         `${__dirname}/../templates/errors.md`,
         'utf8'
       )
+      // TODO remove, we could potentially be flooded from this one
       await commentToIssue(context, errorTpl, { errors: res.message })
       return false
     }
 
-    await commentToIssue(context, template, {
-      channels: ENABLED_CHANNELS.join(' ')
-    })
-    await addLabels(context, ['published'])
     return true
   } else {
     // FIXME, triggered when @enovitae-bot publish (no args)
@@ -70,16 +66,16 @@ export default async function run(
           // FIXME understand how determine if publishing is a fail (for all records)
           publishStatus = await runPublish(
             args,
-            prettyPrint({ [k]: entry }),
-            context,
-            template
+            prettyPrint({ [k]: entry }, false),
+            context
           )
         }
         if (publishStatus) {
           await commentToIssue(context, template, {
-            text: prettyPrint(filteredDB),
+            text: '\u{1F64C} Success!: check your previously specified channel',
             channels: ENABLED_CHANNELS.join(' ')
           })
+          await addLabels(context, ['published'])
           return true
         } else {
           await commentToIssue(context, template, {
