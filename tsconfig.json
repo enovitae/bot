@@ -15,5 +15,11 @@
     "skipLibCheck": true,
     "newLine": "lf"
   },
-  "exclude": ["./dist", "./node_modules", "./src/__tests__", "./coverage"]
+  "exclude": [
+    "./dist",
+    "./node_modules",
+    "./src/__tests__",
+    "./coverage",
+    "./README.md"
+  ]
 }
