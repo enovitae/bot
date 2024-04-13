@@ -10,9 +10,6 @@ import {
 } from '../__mocks__/handlers'
 import { OctokitResponse } from '@octokit/types'
 
-// jest.mock('../__mocks__/node')
-// jest.mock('../__mocks__/handlers')
-
 beforeAll(() => {
   // Enable API mocking before all the tests.
   server.listen()
@@ -59,24 +56,24 @@ it('receives a mocked response to a REST API request accessing to data', async (
 })
 
 it('test publish commands', async () => {
-  expect(await runPublish([''], diffJSON.data, context, '')).toBeFalsy()
+  expect(await runPublish([''], diffJSON.data, context)).toBeFalsy()
   expect(
-    await runPublish(['telegramd'], diffJSON.data, context, '')
+    await runPublish(['telegramd'], diffJSON.data, context)
   ).toBeFalsy()
-  expect(await runPublish([], diffJSON.data, context, '')).toBeFalsy()
+  expect(await runPublish([], diffJSON.data, context)).toBeFalsy()
   // test runtime skipping compile errors
   // @ts-ignore
-  expect(await runPublish(undefined, diffJSON.data, context, '')).toBeFalsy()
+  expect(await runPublish(undefined, diffJSON.data, context)).toBeFalsy()
   // @ts-ignore
-  expect(await runPublish(null, diffJSON.data, context, '')).toBeFalsy()
+  expect(await runPublish(null, diffJSON.data, context)).toBeFalsy()
   // @ts-ignore
-  expect(await runPublish('null', diffJSON.data, context, '')).toBeFalsy()
-  expect(await runPublish(['whatsapp'], diffJSON.data, context, '')).toBeFalsy()
+  expect(await runPublish('null', diffJSON.data, context)).toBeFalsy()
+  expect(await runPublish(['whatsapp'], diffJSON.data, context)).toBeFalsy()
   expect(
-    await runPublish(['pinterest'], diffJSON.data, context, '')
+    await runPublish(['pinterest'], diffJSON.data, context)
   ).toBeFalsy()
   expect(
-    await runPublish(['telegram'], diffJSON.data, context, '')
+    await runPublish(['telegram'], diffJSON.data, context)
   ).toBeTruthy()
-  expect(await runPublish(['zapier'], diffJSON.data, context, '')).toBeTruthy()
+  expect(await runPublish(['zapier'], diffJSON.data, context)).toBeTruthy()
 })
