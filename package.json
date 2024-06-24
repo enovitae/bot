@@ -73,7 +73,7 @@
     "axios": "^1.6.8",
     "front-matter": "^4.0.2",
     "gitdiff-parser": "^0.3.1",
-    "gitlog": "^4.0.8",
+    "gitlog": "^5.0.1",
     "glob": "^10.3.12",
     "mustache": "^4.2.0"
   },
