@@ -70,7 +70,7 @@
     "@actions/github": "^6.0.0",
     "@octokit/rest": "^21.0.0",
     "@octokit/types": "^13.4.1",
-    "axios": "^1.6.8",
+    "axios": "^1.7.2",
     "front-matter": "^4.0.2",
     "gitdiff-parser": "^0.3.1",
     "gitlog": "^4.0.8",
